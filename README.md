@@ -26,3 +26,9 @@ python manage.py runserver 로 정상 서버 실행 확인
 python manage.py migrate db 생성. sqlite3 사용.
 python manage.py createsuperuser 로 관리자계정 생성
 (kdy, kdy@learndjango.com, mysuperuser)
+
+(venv) (base) godayeong@godayeong-ui-MacBookAir django_web_app % git add . (터미널에 현재 서버 변경 기록 추가)
+(venv) (base) godayeong@godayeong-ui-MacBookAir django_web_app % git commit -m "Django 프로젝트 생성" (커밋 메시지, 커밋)
+
+3일차
+앱(maps) 생성 -> map으로 할걸 그랬다.
