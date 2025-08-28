@@ -36,5 +36,15 @@ python manage.py createsuperuser 로 관리자계정 생성
 
 4일차
 내용 드리프트해서 일단 책 내용 따라가보기로.
-
-
+Q : 왜 새로운 앱을 만들면 프로젝트폴더/settings.py의 installed app에 등록해야 하는가?
+blog의 model 작성 -> makemigrations -> migrate -> 그런데 이미 이전 app에서 migrate를 gitignore에 등록. 저장 상태 확인 필요.
+admin.py에 post 모델 import
+Q : admin.py를 작성할 때, admin.site.register(Post)는 무슨 의미지?
+*오류로그 : /blog/admin.py 에 from models import Post 라고 작성 -> from .models import Post라고 작성해야.
+    왜? : Django에서 앱 내부의 models.py를 불러올 때는 상대 경로(import) 대신 현재 앱 패키지를 기준으로 가져와야(gpt 왈)
+        -> 즉, models는 독립된 모듈이 아니라 blog.models(축약 .models)라는 풀네임을 가져야 함.
+admin에서 post를 볼 수 있음. 정상적으로 작성 가능.
+post모델에 __str__ 함수 선언
+Q : str 함수란 무엇이고 왜 이렇게(__str__) 작성하는가?
+Q : 또한 str 함수에 포함된 self.pk는 무엇인가? 또한 왜 이런 양식으로 작성하는가?
+프로젝트 파일 내 settings.py의 TIME_ZONE 항목 "Asia/Seoul" 로 수정.
