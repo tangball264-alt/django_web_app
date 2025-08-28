@@ -31,4 +31,10 @@ python manage.py createsuperuser 로 관리자계정 생성
 (venv) (base) godayeong@godayeong-ui-MacBookAir django_web_app % git commit -m "Django 프로젝트 생성" (커밋 메시지, 커밋)
 
 3일차
-앱(maps) 생성 -> map으로 할걸 그랬다.
+앱(maps) 생성 -> map으로 할걸 그랬다. 저장(maps 앱 생성하기)
+
+
+4일차
+내용 드리프트해서 일단 책 내용 따라가보기로.
+
+
