@@ -48,3 +48,13 @@ post모델에 __str__ 함수 선언
 Q : str 함수란 무엇이고 왜 이렇게(__str__) 작성하는가?
 Q : 또한 str 함수에 포함된 self.pk는 무엇인가? 또한 왜 이런 양식으로 작성하는가?
 프로젝트 파일 내 settings.py의 TIME_ZONE 항목 "Asia/Seoul" 로 수정.
+
+5일차
+*장고 셀 사용하기 (python manage.py shell) -> 파이썬 특유의 한줄씩 실행 가능. 끝내기(exit())
+작성 시각과 수정 시각의 자동 저장
+Q : models의 항목에 auto_now_add와 auto_now는 뭐가 다르지?
+*오류로그 : 기존 models.py에서 changed_at 을 null 가능으로 해둠 -> 이번에 auto_now로 하면서 null 불가 -> 기존 post의 null을 어떻게 처리할지
+    따라서 어떤 방식으로 수정할지 반문함. 
+    ->나는 1번(하나의 디폴트 값으로 일단 전부 채운다)을 선택. 어떤 디폴트를 쓸지 반문하자 timezone.now(파이썬 언어로 답해야?)로 현재시간으로 지정.
+실행후 확인하자 시간 입력칸이 사라짐.
+
