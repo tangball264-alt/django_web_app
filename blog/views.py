@@ -11,3 +11,13 @@ def index(request):
             'posts' : posts,
         }#딕셔너리 형태로 세 번째 변수 'posts'를 지정.
     ) # index(요청)을 실행하면, '요청'의 내용을 반영해 blog/index.html 페이지를 화면에 출력(렌더링?)한다.
+
+def single_post_page(request, pk):
+    post = Post.objects.get(pk=pk)
+    return render(
+        request,
+        'blog/single_post_page.html',
+        {
+            'post' : post,
+        }
+    )
