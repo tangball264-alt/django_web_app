@@ -5,7 +5,11 @@
     <title>{{post.title}}</title>
 </head>
 <body>
-
+    <nav>
+        <a href="/blog/">Blog</a>
+        <a href="/">landing</a>
+        <a href="/about_me/">About me</a>
+    </nav>
     <h2>{{post.title}}</h2>
     <h4>작성일자 : {{post.created_at}} | 최근 수정일자 : {{post.changed_at}}</h4>
     <p>{{post.content}}</p>

@@ -81,4 +81,16 @@ get_absolute_url은 model에 def로 함수 작성. -> str처럼? -> view on site
 Q : history나 view on site는 기본 django에 있는 건가? 그러면 get absolute url 함수도 기본으로 있는거 쓰는건가?
 A : 실제로 이미 존재하는 메서드가 맞으며, 메서드 오버라이딩을 위해 우리가 models에 작성하는 것.
 
+8일차
+single_pages 앱의 about_me 페이지와 landing 페이지 작성.
+single_pages/urls.py 와 html 파일 작성.
+models 안적어도 app 작성이 가능함. 
 
+9일차
+기존 페이지(FBV 방식)을 CBV 방식으로 전환
+blog/views.py에 PostList 클래스 생성.(ListView 클래스 상속-사용.) 모델=포스트
+urls.py에 index path대신  postlist 이용해서 path 지정 하도록 함.
+*오류로그 : path는 끝에 쉼표 빼먹으면 서버 실행도 못함.
+Q : blog/urls.py의 as_view()는 뭐지? 이 문법은 무슨 의미지?
+view에서 postList에 템플릿 네임 지정.(혹은 post_list.html 파일을 만들어  사용.)
+전자 이용했으므로 index.html 파일의 posts for문을 post_list(혹은 object_list)에 대한 for 문으로 변경
