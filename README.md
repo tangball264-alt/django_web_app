@@ -94,3 +94,36 @@ urls.py에 index path대신  postlist 이용해서 path 지정 하도록 함.
 Q : blog/urls.py의 as_view()는 뭐지? 이 문법은 무슨 의미지?
 view에서 postList에 템플릿 네임 지정.(혹은 post_list.html 파일을 만들어  사용.)
 전자 이용했으므로 index.html 파일의 posts for문을 post_list(혹은 object_list)에 대한 for 문으로 변경
+부트스트랩 blog 페이지 가져오기. 
+*오류로그 : css 위치 틀렸는지, 부트스트랩 파일이 틀렸는지 정상 작동 안됨.
+
+10일차
+파일 구조 수정하자 정상적으로 css 적용이 됨.
+파일 구조
+DJANGO_WEB_APP
+├── blog/                  # 앱
+│   ├── templates/         # HTML 템플릿 폴더
+│   │   └── blog/          # 앱 이름과 같은 하위 폴더 생성 권장
+│   │       ├── index_template.html
+│   │       └── single_post_page.html
+│   │
+│   ├── static/            # 정적 파일 (CSS, JS, 이미지)
+│   │   └── blog/          # 앱 이름과 같은 하위 폴더 생성 권장
+│   │       ├── css/
+│   │       │   └── styles.css
+│   │       ├── js/
+│   │       │   └── scripts.js
+│   │       └── bootstrap/
+│   │           ├── bootstrap.min.css
+│   │           └── bootstrap.min.js
+│   │
+│   ├── views.py
+│   ├── ...
+│   └── models.py
+이하생략
+이제 이 디자인을 내 웹에 맞추어 수정.
+포스트 리스트-카드를 for 문으로 사용했더니, 한 줄에 두 개의 카드가 아닌, 한 줄에 하나의 카드만 나오는 문제. 
+따라서 {% if forloop.first %}를 이용, 첫 번째 p만을 큰 카드로 하고, 이후 다른 p를 모두 {% else %}로 처리. 이후 {% endif %}로 마무리.
+페이지 리스트 지워야 할까?
+다른 페이지에도 모두 템플릿의 공통 요소 적용. -> 공통 요소란? : navbar
+navbar 아래 조금 띄우도록 할 필요 있음.

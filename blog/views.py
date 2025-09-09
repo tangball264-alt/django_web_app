@@ -4,9 +4,9 @@ from .models import Post
 
 class PostList(ListView):
     model = Post
-    template_name = 'blog/index.html'
+    template_name = 'blog/index_template.html'
 
-    
+
 # Create your views here.
 def index(request):
     posts = Post.objects.all()
