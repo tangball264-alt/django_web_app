@@ -127,3 +127,34 @@ DJANGO_WEB_APP
 페이지 리스트 지워야 할까?
 다른 페이지에도 모두 템플릿의 공통 요소 적용. -> 공통 요소란? : navbar
 navbar 아래 조금 띄우도록 할 필요 있음.
+
+11일차
+포스트 상세 페이지 부트스트랩 템플릿 적용
+원래 교재에서는 부트스트랩 4 써서 
+<script src="https://code.iquery.com/jquery-3.5.1.slim.min.js" integr-ity"sha8d-ofidz7htPllsSSnCTpuj/zy4C=CGpamoFVySBHVBnE+IOoVYUJew +0rCXaRkfj"
+crossorigin="anonymous"></script>
+<script sre-"htps:/an.jsdelivr.mnet/npm/pocer.isg1.16.1/cist/umd/pooper.min.is" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7n iu7355k7lN"
+crossorigin="anonymous"></script>
+<script src-"https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap. min.js"
+integrity="sha384-w104orYj80ndcko6inVbzY0tgp4pl6+1z71r36Ikzbvr/aHKhXdBN mNb5092v7s"
+crossorigin="anonymous"></script>
+을 각 html 파일 마지막에 작성하라고 하는데, 나는 5 써서 기존 것을 유지해도 괜찮다.
+*단, GPT 추천 사항으로는 '무결성'검증을 위해 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script> 코드를 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script> 로 변경할 것 권고 + <script src="{% static 'blog/js/post_scripts.js' %}"></script> 로 static_url 로 불러오기.
+
+무결성 검증은 나중에 보안 부분에 초점 두고 다시 훑을 거니 두고, js파일만 정리.
+기존 파일에서는 텍스트를 한 줄 한줄 띄우는데, 나 역시 이렇게 해야 할까?
+*오류로그 : 페이지 목록에서 큰 카드와 작은 카드를 병용하는 데 성공하고 해결된 줄 알았지만, 사실 포스트가 2개라서 몰랐는데, 세 번째 카드와 두 번째 카드가 같은 높이에 있어야 하는데 이게 줄 나눔 되었음.
+-> if post_list 로 포스트 리스트에 내용이(하나의 포스트라도) 존재한다면 첫 번째 포스트를(post_list.0) 큰 카드에 형식에 맞게 출력
+-> 그리고 for 문을 row 아래, col 위에 {% for p in post_list|slice:"1:" %} 로 작성해 두 번째 포스트부터 
+1 2
+3 4 형식으로 순서 배열되게 함.
+추가적으로 내용이 길어지니 포스트의 세로 길이를 고정하고 나머지를 ....으로 줄여 생략하는 기능을 넣고 싶음.
+우선 navbar fixed-top 부분을 지우라고 지시하는데, 애초에 nav를 통일하려고 덮어씌웠더니 지워짐. 탑 패딩도 생략함.
+전체 텍스트를 <p>로 묶어 입력하니, 줄바꿈이 모두 생략됨. 해당 사항에 대하여 수정 필요.
+현재 수정이 필요한 사항
+1. 포스트 목록 화면에서 목록 카드의 길이를 고정하고, 긴 콘텐츠를 후략 하는 것.
+2. 포스트 상세 페이지에서 콘텐츠 내용에 줄바꿈이 포함되어 단락이 구분되도록 하는 것.
+3. 포스트에 이미지 추가.
+
