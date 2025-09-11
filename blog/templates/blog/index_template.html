@@ -48,7 +48,11 @@
                     <!-- 포스트 리스트 -->
                     {% if post_list %}
                     <div class="card mb-4">  <!-- 첫번째 포스트는별도로 가로 크기 조정 없이, 8 사이즈 전체에 걸쳐.-->
+                        {% if post_list.0.head_image %}
+                        <a href="#!"><img class="card-img-top" src="{{post_list.0.head_image.url }}" alt="..." /></a>
+                        {% else %}
                         <a href="#!"><img class="card-img-top" src="https://dummyimage.com/850x350/dee2e6/6c757d.jpg" alt="..." /></a>
+                        {% endif %}
                         <div class="card-body">
                             <div class="small text-muted">{{ post_list.0.created_at }}</div>
                             <h2 class="card-title">{{ post_list.0.title }}</h2>
@@ -65,7 +69,11 @@
                         <div class="col-lg-6">
                             <!-- Blog post-->
                             <div class="card mb-4">
-                                <a href="#!"><img class="card-img-top" src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..." /></a>
+                                {% if p.head_image %}
+                                <a href="#!"><img class="card-img-top" src="{{p.head_image.url }}" alt="..." /></a>
+                                {% else %}
+                                <a href="#!"><img class="card-img-top" src="https://dummyimage.com/850x350/dee2e6/6c757d.jpg" alt="..." /></a>
+                                {% endif %}
                                 <div class="card-body">
                                     <div class="small text-muted">{{ p.created_at }}</div>
                                     <h2 class="card-title">{{ p.title }}</h2>

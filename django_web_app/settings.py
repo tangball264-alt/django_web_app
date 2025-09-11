@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -122,3 +123,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+MEDIA_URL = '/media/' #도메인 뒤에 이 경로가 붙으면 미디어 파일을 쓴다.
+MEDIA_ROOT = os.path.join(BASE_DIR, '_media') #베이스 디렉토리(=프로젝트 폴더) 아래 _media 라는 폴더를 만들고 여기에 이미지 파일을 저장

@@ -158,3 +158,24 @@ crossorigin="anonymous"></script>
 2. 포스트 상세 페이지에서 콘텐츠 내용에 줄바꿈이 포함되어 단락이 구분되도록 하는 것.
 3. 포스트에 이미지 추가.
 
+다음 단계로 포스트 이미지 추가
+
+12일차
+이미지 파일 넣기
+1. 이미지를 저장할 수 있게 만들고
+2. admin의 post 작성에서 이미지를 넣을 수 있게 하고
+3. 화면상에 맞게 출력하기
++그러면 모델도 수정해야 하겠네.
+
+settings에 media url과 media root 지정. 특히 root는 os 라이브러리 이용하는데
+Q : os 라이브러리는 뭐고 os.path.join(BASE_DIR, '_media')가 뜻하는 말은 뭐지?
+그리고 모델 수정해서 헤드 이미지 항목을 추가. imagefield를 이용해 업로드 폴더와 공백 가능 설정을 추가해 저장.
+모델 수정했으니 makemigrations하면 python -m pip install Pillow 커맨드로 pillow 라이브러리를 설치하라고 요청받음. 사유 : 파이썬은 이미지 처리에 이 라이브러리 사용.
+이미지 업로드 후 확인. 이 프로젝트 폴더에는 이미지가 올라오고, 수정하며 필요 없어진 이미지도 저장되는데다가 중복 이미지도 이름이 바뀌어 저장됨. 하지만 아직 수정 안한 블로그 페이지 뿐만 아니라, 이미지를 업로드한 admin 페이지에서도 이미지를 확인하는 것은 오류 발생. -> urls.py에서 media url 설정 필요.
+기존 url이 urlpatterns=[] 인데, 미디어 url은 기존 url에 이미지가 포함되면 /media/를 덧붙이는 거니까, urlpatterns += 로.
+Q : from django.conf import settings와 from django.conf.urls.static import static를 import 했는데, 이는 settings.py파일과 static 폴더를 쓴다는 소리래. 왜?
+이제 admin에서 이미지 확인하려고 링크 누르면 http://localhost:8000/media/blog/images/2025/09/11/스크린샷_2024-03-26_오후_1.34.35.png 같은 식으로 /media/아래로 지정한 주소 방식/이름 해서 이미지 뜸.
+index_template.html 파일을 수정 + head image 없는 경우 if 문을 이용해 더미 이미지 출력.
+전부 세팅 했는데, ![alt text](https://file%2B.vscode-resource.vscode-cdn.net/var/folders/kq/jy9fwtwj4vg59mpcmm2n8k3r0000gn/T/TemporaryItems/NSIRD_screencaptureui_WSbOAy/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202025-09-11%20%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE%2010.45.29.png?version%3D1757598336864)
+* 오류 로그 : 이렇게 오류 발생. 왜 정상적으로 업로드가 안되는걸까?
+    ->실수로 이미지 출력 src에 {{p.head_image}}라고 작성. {{p.head_image.url}}이라 작성해야 함.
