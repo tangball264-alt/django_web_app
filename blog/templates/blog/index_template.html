@@ -49,15 +49,16 @@
                     {% if post_list %}
                     <div class="card mb-4">  <!-- 첫번째 포스트는별도로 가로 크기 조정 없이, 8 사이즈 전체에 걸쳐.-->
                         {% if post_list.0.head_image %}
-                        <a href="#!"><img class="card-img-top" src="{{post_list.0.head_image.url }}" alt="..." /></a>
+                        <a href="#!"><img class="card-img-top" src="{{post_list.0.head_image.url }}" alt="{{post_list.0.title}} Header Image" /></a>
+                        <!-- alt = "..."의 경우, 이미지를 보일 수 없을 때, 대신 츨력할 텍스트이다.-->
                         {% else %}
-                        <a href="#!"><img class="card-img-top" src="https://dummyimage.com/850x350/dee2e6/6c757d.jpg" alt="..." /></a>
+                        <a href="#!"><img class="card-img-top" src="https://picsum.photos/seed/{{post_list.0.id}}/850/350/" alt="Random Image" /></a>
                         {% endif %}
                         <div class="card-body">
                             <div class="small text-muted">{{ post_list.0.created_at }}</div>
                             <h2 class="card-title">{{ post_list.0.title }}</h2>
                             <p class="card-text">{{ post_list.0.content }}</p>
-                            <a class="btn btn-primary" href="{{p.get_absolute_url}}">Read more →</a>
+                            <a class="btn btn-primary" href="{{post_list.0.get_absolute_url}}">Read more →</a>
                         </div>
                     </div>
                     {% else %}
@@ -70,9 +71,7 @@
                             <!-- Blog post-->
                             <div class="card mb-4">
                                 {% if p.head_image %}
-                                <a href="#!"><img class="card-img-top" src="{{p.head_image.url }}" alt="..." /></a>
-                                {% else %}
-                                <a href="#!"><img class="card-img-top" src="https://dummyimage.com/850x350/dee2e6/6c757d.jpg" alt="..." /></a>
+                                <a href="#!"><img class="card-img-top" src="{{p.head_image.url }}" alt="{{p.title}} Head Image" /></a>
                                 {% endif %}
                                 <div class="card-body">
                                     <div class="small text-muted">{{ p.created_at }}</div>

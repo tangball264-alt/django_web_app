@@ -5,6 +5,7 @@ from .models import Post
 class PostList(ListView):
     model = Post
     template_name = 'blog/index_template.html'
+    ordering = '-pk'
 
 
 # Create your views here.

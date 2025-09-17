@@ -179,5 +179,13 @@ index_template.html 파일을 수정 + head image 없는 경우 if 문을 이용
 전부 세팅 했는데, ![alt text](https://file%2B.vscode-resource.vscode-cdn.net/var/folders/kq/jy9fwtwj4vg59mpcmm2n8k3r0000gn/T/TemporaryItems/NSIRD_screencaptureui_WSbOAy/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202025-09-11%20%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE%2010.45.29.png?version%3D1757598336864)
 * 오류 로그 : 이렇게 오류 발생. 왜 정상적으로 업로드가 안되는걸까?
     ->실수로 이미지 출력 src에 {{p.head_image}}라고 작성. {{p.head_image.url}}이라 작성해야 함.
-여기까지 저장
 상세페이지 이미지 출력 기능 추가.
+
+13일차
+filefield로 위와 같이 파일 업로드 기능 추가.
+모델 수정했으나, runserver에서 새로고침하자 오류 -> makemigrations와 migrate 안해서.
+하고 정상 업로드. html 수정해서 포스트 창에서 확인 및 다운 가능하게 해야.
+포스트 리스트 + 싱글 페이지에 이미지 없을 경우 출력 생략
+단, 포스트 리스트의 top 포스트가 이미지 없을 경우 lorem picsum으로 더미 이미지 출력('https://picsum.photos/가로픽셀수/세로픽셀수'
+랜덤 포스트를 새로고침 시에도 고정하기 위해서, 시드 사용 -> picsum.photos/seed/id값(p.id)/가로픽셀수/세로픽셀수
+항상 1번 포스트를 위에 올려두면 기능 확인이 어려우니, 포스트 순서 최신순으로 변경.(views 의 class postlist에 ordering = '-pk' 추가.)
