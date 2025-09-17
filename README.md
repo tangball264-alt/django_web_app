@@ -189,3 +189,14 @@ filefield로 위와 같이 파일 업로드 기능 추가.
 단, 포스트 리스트의 top 포스트가 이미지 없을 경우 lorem picsum으로 더미 이미지 출력('https://picsum.photos/가로픽셀수/세로픽셀수'
 랜덤 포스트를 새로고침 시에도 고정하기 위해서, 시드 사용 -> picsum.photos/seed/id값(p.id)/가로픽셀수/세로픽셀수
 항상 1번 포스트를 위에 올려두면 기능 확인이 어려우니, 포스트 순서 최신순으로 변경.(views 의 class postlist에 ordering = '-pk' 추가.)
+첨부파일 다운로드를 별도 버튼 이용 : 
+    기존 버튼 코드인 <button type="button" class="btn btn-outline-primary">Primary</button>에 다운로드할 파일 url 삽입해
+    <a href="{{ post.attachment.url }}" button type="button" class="btn btn-outline-primary">Primary</button> 이렇게 했는데 문법 틀림.
+    따라서 이를 해결한 ai 추천 코드인 <a href="{{post.attachment.url}}" download class="btn btn-outline-primary">다운로드</a>
+    그런데 교재 추천의 경우 role = "button"이 웹 접근성 표준을 보다 충족함. 따라서 이것으로 변경.
+    -> 최종적으로는, 하이퍼링크(a href)로 다운로드(download) 기능을 만들고 + 기존 css에 이미 존재하는 버튼 디자인을 차용해 버튼 모양으로 만들고(class) + 시각장애인용 스크린 리더 등에서 시스템적으로 버튼 취급(role)
+모델에 함수 get_file_name, get_file_ext 추가. 각각 '파일명.확장자', '확장자'리턴. (ext : extension)
+추가적으로 해보고 싶은 것들
+-최신 포스트를 위한 랜덤 이미지를 사용할 때, 로딩 시간 동안 spinner 적용하기
+-포스트 리스트 길이 조정해서 생략.
+-첨부파일 다운 버튼을 button group 으로 바꿔서, "열기 | 다운"으로 나누기.
