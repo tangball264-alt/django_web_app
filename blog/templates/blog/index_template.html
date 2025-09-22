@@ -39,7 +39,7 @@
             </div>
         </header>
         <!-- Page content-->
-        <div class="container">
+        <div class="container" id="main-area">
             <div class="row">
                 <!-- Blog entries-->
 
@@ -62,7 +62,7 @@
                         </div>
                     </div>
                     {% else %}
-                    <p> 아직 작성된 포스트가 없습니다. </p>
+                    <h3> 아직 작성된 포스트가 없습니다. </h3>
                     {% endif %}
                     <!-- Nested row for non-featured blog posts-->
                     <div class="row"> <!-- 그 이후 포스트 -->
@@ -72,13 +72,21 @@
                             <div class="card mb-4">
                                 {% if p.head_image %}
                                 <a href="#!"><img class="card-img-top" src="{{p.head_image.url }}" alt="{{p.title}} Head Image" /></a>
-                                {% endif %}
+                                
                                 <div class="card-body">
                                     <div class="small text-muted">{{ p.created_at }}</div>
                                     <h2 class="card-title">{{ p.title }}</h2>
-                                    <p class="card-text">{{ p.content }}</p>
+                                    <p class="card-text">{{ p.content | truncatewords:15}}</p>
                                     <a class="btn btn-primary" href="{{p.get_absolute_url}}">Read more →</a>
                                 </div>
+                                {% else %} 
+                                <div class="card-body">
+                                    <div class="small text-muted">{{ p.created_at }}</div>
+                                    <h2 class="card-title">{{ p.title }}</h2>
+                                    <p class="card-text">{{ p.content | truncatewords:50}}</p>
+                                    <a class="btn btn-primary" href="{{p.get_absolute_url}}">Read more →</a>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         {% endfor %}

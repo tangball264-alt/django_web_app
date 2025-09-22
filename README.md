@@ -196,7 +196,46 @@ filefield로 위와 같이 파일 업로드 기능 추가.
     그런데 교재 추천의 경우 role = "button"이 웹 접근성 표준을 보다 충족함. 따라서 이것으로 변경.
     -> 최종적으로는, 하이퍼링크(a href)로 다운로드(download) 기능을 만들고 + 기존 css에 이미 존재하는 버튼 디자인을 차용해 버튼 모양으로 만들고(class) + 시각장애인용 스크린 리더 등에서 시스템적으로 버튼 취급(role)
 모델에 함수 get_file_name, get_file_ext 추가. 각각 '파일명.확장자', '확장자'리턴. (ext : extension)
+포스트 리스트의 카드 글자 수 제한 : truncatewords 할까, truncatechars할까. 생략이 단어에 맞추어 깔끔하게 떨어지는 것과 길이조정에 안정감있는 것 중에서.
+일단 예시 기준으로 단어 단위로 자름. 이미지 있는 것과 없는 것 단어수 다르게 잘랐고, 요약문 추가 기능은 입력 시 손이 가는 부분이라 불필요할 것 같아 잘라냄.
+
 추가적으로 해보고 싶은 것들
 -최신 포스트를 위한 랜덤 이미지를 사용할 때, 로딩 시간 동안 spinner 적용하기
--포스트 리스트 길이 조정해서 생략.
--첨부파일 다운 버튼을 button group 으로 바꿔서, "열기 | 다운"으로 나누기.
+-포스트 리스트 좌우 카드 길이 동일하게 맞추기.
+-첨부파일 다운 버튼을 button group 으로 바꿔서, "열기 | 다운"으로 나누기
+
+14일차
+테스트 기능
+tests.py에서 수행함. DB수정 없이 다양한 상황 테스트 가능
+Class TestView에, setup(기본 제공 오버라이딩)과 post list 테스트 -> 두 개 메서드(def).
+포스트 목록 페이지 구조와 DB 상황에 따른 페이지 상태를 어떤 것을 검사할지 주석으로 나열.
+pip install beautifulsoup4 (bs4 설치 완료)
+코드 작성 및 실행.
+>> python manage.py test 
+Found 1 test(s). 
+Creating test database for alias 'default'... 
+System check identified no issues (0 silenced). 
+F  # 여기까지 테스트 실행 중
+====================================================================== 
+FAIL: test_post_list (blog.tests.TestView.test_post_list) # 테스트 실패. test_post_list 메서드에서 실패함.
+---------------------------------------------------------------------- 
+Traceback (most recent call last):
+ File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 22, in test_post_list
+  self.assertIn('About Me', navbar.text) #About Me가 있다는 것을 확인하는 코드
+  ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^ 
+AssertionError: 'About Me' not found in '\n\nBLOG with Django\n\n\n\nLanding\nAboutMe\nBlog\n\n\n\n' #우측 문구 보면 About Me는 없음(띄어쓰기 문제)
+---------------------------------------------------------------------- 
+Ran 1 test in 0.014s FAILED (failures=1)
+
+AboutMe로 수정 후 재실행.
+self.assertIn('아직 작성된 포스트가 없습니다.', main_area.text)
+                                         ^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'text'
+main_area가 어떤 값도 없는(None) 오브젝트라, text 라는 속성이 없다.
+정확히는,         main_area = soup.find('div',id='main-area') 에서 main-area라는 id의 div를 찾지 못해 아무것도 main_area에 반환하지 못했고, 따라서 이 객체는 None(값 없음)이며, 이 경우 타입이 논타입으로 분류됨.
+즉, 메인 에어리어를 만들 것.
+blog entries의 div에 id 추가. <div class="col-lg-8" id="main-area">
+                    
+15일차
+포스트 상세페이지 테스트 코드 -> post-area 추가. <div class="col-lg-8">에 임시로 추가하나, 해당 코드가 지금은 삭제된 '댓글'란을 포함하는 영역이기에, 향후 댓글란을 추가하게 되면 <article>의 바로 위 또는 아래로 div태그를 삽입해 해당 태그를 포스트 영역으로 할 것.
+포스트 리스트 페이지도 main area를 footer와 navbar를 제외한 div class = container로 수정.  상세 포스트 페이지도 container에 main-area
