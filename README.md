@@ -239,3 +239,22 @@ blog entries의 div에 id 추가. <div class="col-lg-8" id="main-area">
 15일차
 포스트 상세페이지 테스트 코드 -> post-area 추가. <div class="col-lg-8">에 임시로 추가하나, 해당 코드가 지금은 삭제된 '댓글'란을 포함하는 영역이기에, 향후 댓글란을 추가하게 되면 <article>의 바로 위 또는 아래로 div태그를 삽입해 해당 태그를 포스트 영역으로 할 것.
 포스트 리스트 페이지도 main area를 footer와 navbar를 제외한 div class = container로 수정.  상세 포스트 페이지도 container에 main-area
+저장
+모듈화 단계
+모듈화 진행에 앞서 불필요한 html 파일 제거하고(템플릿 적용 전 파일 등), 이름을 정리하여 둘 필요 있다.
+
+16일차
+모듈화와 함께 템플릿 계열 파일의 내용을 보존한 채, 간소화한 이름의 파일로 모듈 내용을 옮겨야 함.
+교재의 파일명을 따라가기로 함.
+base.html -> 신규 페이지. post_list의 header, navbar, footer 파트 사용.
+post_list.html -> 신규 페이지, index_template의 main_area 사용.
+post_detail.html -> 신규 페이지. post_page_template의 main area 사용.(예정)
+기존의 템플릿 적용 전 파일 삭제.(정확히는, 그거 이름 바꾸고 내용 지워서 사용중.)
+이에 따라 views.py의 내용에서 html 파일 렌더링을 수정.
+test-ok -> 교재는 왜 post_detail은 오류난다고 하는지 모르겠다. 나는 post_detail은 아직 손 안대어서 멀쩡함. 이제 그 부분 수정해야.
+참고로 일부만 테스트 할 시, python manage.py test blog.tests.TestView.test_post_list 로 하면 일부만 테스트 가능.
+이렇게 할 경우, navbar의 현재 페이지 표시가 정상적으로 작동할 지 알 수 없다. -> 하지만 navbar의 다른 항목인 랜딩과 어바웃미는 다른 앱이므로 괜찮을듯?
+post_detail 파일 작성 후 테스트
+test-failed : head 부분의 <title>이 맞지 않음. 해당 태그 안에서, 내용만 block head_title로 분리. 포스트 디테일 페이지는 변경할 값을 넣고, 그 외는 베이스 파일에서 삭제하지 않은 <title>의 값을 디폴트로 가져감.
+test-ok
+

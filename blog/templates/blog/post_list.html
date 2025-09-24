@@ -1,20 +1,111 @@
-<!DOCTYPE html>
-<html lang="ko">
-    <head>
-        <meta charset="UTF-8">
-        <title>Blog</title>
-    </head>
-    <body>
-        <nav>
-            <a href="/">landing</a>
-            <a href="/about_me/">About me</a>
-        </nav>
-        <h1>블로그 페이지 목록</h1>
-        {% for p in posts %} <!-- Django 제공 기능인 '템플릿 태그' -->
-            <hr/>
-            <h3><a href="{{p.get_absolute_url}}">{{ p.title }}</a></h3> <!-- Django 제공 기능인 '템플릿 변수 출력'-->
-            <h4>{{ p.created_at }}</h4>
-            <p> {{ p.content }}</p>
-        {% endfor %} # <!-- 이건 그냥 for 문 끝났다고. -->
-    </body>
-</html>
+{% extends 'blog/base.html' %} <!-- base.html을 확장해 이 html에 넣기. -->
+{% block main_area %}
+    <div class="row">
+    <!-- Blog entries-->
+
+        <div class="col-lg-8"><!--포스트 목록은 전체 가로 12 중 8 크기.-->
+            <!-- Featured blog post-->
+            <!-- 포스트 리스트 -->
+            {% if post_list %}
+            <div class="card mb-4">  <!-- 첫번째 포스트는별도로 가로 크기 조정 없이, 8 사이즈 전체에 걸쳐.-->
+                {% if post_list.0.head_image %}
+                <a href="#!"><img class="card-img-top" src="{{post_list.0.head_image.url }}" alt="{{post_list.0.title}} Header Image" /></a>
+                <!-- alt = "..."의 경우, 이미지를 보일 수 없을 때, 대신 츨력할 텍스트이다.-->
+                {% else %}
+                <a href="#!"><img class="card-img-top" src="https://picsum.photos/seed/{{post_list.0.id}}/850/350/" alt="Random Image" /></a>
+                {% endif %}
+                <div class="card-body">
+                    <div class="small text-muted">{{ post_list.0.created_at }}</div>
+                    <h2 class="card-title">{{ post_list.0.title }}</h2>
+                    <p class="card-text">{{ post_list.0.content }}</p>
+                    <a class="btn btn-primary" href="{{post_list.0.get_absolute_url}}">Read more →</a>
+                </div>
+            </div>
+            {% else %}
+            <h3> 아직 작성된 포스트가 없습니다. </h3>
+            {% endif %}
+            <!-- Nested row for non-featured blog posts-->
+            <div class="row"> <!-- 그 이후 포스트 -->
+                {% for p in post_list|slice:"1:" %} 
+                <div class="col-lg-6">
+                    <!-- Blog post-->
+                    <div class="card mb-4">
+                        {% if p.head_image %}
+                        <a href="#!"><img class="card-img-top" src="{{p.head_image.url }}" alt="{{p.title}} Head Image" /></a>
+                        
+                        <div class="card-body">
+                            <div class="small text-muted">{{ p.created_at }}</div>
+                            <h2 class="card-title">{{ p.title }}</h2>
+                            <p class="card-text">{{ p.content | truncatewords:15}}</p>
+                            <a class="btn btn-primary" href="{{p.get_absolute_url}}">Read more →</a>
+                        </div>
+                        {% else %} 
+                        <div class="card-body">
+                            <div class="small text-muted">{{ p.created_at }}</div>
+                            <h2 class="card-title">{{ p.title }}</h2>
+                            <p class="card-text">{{ p.content | truncatewords:50}}</p>
+                            <a class="btn btn-primary" href="{{p.get_absolute_url}}">Read more →</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination-->
+            <nav aria-label="Pagination">
+                <hr class="my-0" />
+                <ul class="pagination justify-content-center my-4">
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#!">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#!">3</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#!">...</a></li>
+                    <li class="page-item"><a class="page-link" href="#!">15</a></li>
+                    <li class="page-item"><a class="page-link" href="#!">Older</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Side widgets-->
+        <div class="col-lg-4">
+            <!-- Search widget-->
+            <div class="card mb-4">
+                <div class="card-header">Search</div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+                        <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Categories widget-->
+            <div class="card mb-4">
+                <div class="card-header">Categories</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <ul class="list-unstyled mb-0">
+                                <li><a href="#!">Web Design</a></li>
+                                <li><a href="#!">HTML</a></li>
+                                <li><a href="#!">Freebies</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-6">
+                            <ul class="list-unstyled mb-0">
+                                <li><a href="#!">JavaScript</a></li>
+                                <li><a href="#!">CSS</a></li>
+                                <li><a href="#!">Tutorials</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Side widget-->
+            <div class="card mb-4">
+                <div class="card-header">Side Widget</div>
+                <div class="card-body">You can put anything you want inside of these side widgets. They are easy to use, and feature the Bootstrap 5 card component!</div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

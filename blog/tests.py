@@ -72,7 +72,8 @@ class TestView(TestCase):
         self.assertIn(post_001.title, soup.title.text)
         # 2.4 첫 번째 포스트의 제목이 포스트 영역에 있다.
         main_area = soup.find('div', id='main-area')
-        post_area = main_area.find('div', id='post-area')
+        post_area = main_area.find('article', id='post-area')
+        comment_area = main_area.find('section', id='comment-area')
         self.assertIn(post_001.title, post_area.text)
         # 2.5 첫 번째 포스트의 작성자가 포스트 영역에 있다(아직 x)
         # 첫 번째 포스트의 내용이 포스트 영역에 있다.
