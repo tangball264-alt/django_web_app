@@ -257,4 +257,29 @@ test-ok -> 교재는 왜 post_detail은 오류난다고 하는지 모르겠다. 
 post_detail 파일 작성 후 테스트
 test-failed : head 부분의 <title>이 맞지 않음. 해당 태그 안에서, 내용만 block head_title로 분리. 포스트 디테일 페이지는 변경할 값을 넣고, 그 외는 베이스 파일에서 삭제하지 않은 <title>의 값을 디폴트로 가져감.
 test-ok
+테스트 코드의 navbar 부분을 분리하고, 해당 버튼 클릭 시 연결 링크를 점검하는 코드를 추가. 
+test-failed
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 86, in navbar_test
+    self.assertEqual(logo_btn.attrs['href'], '/blog')
+FAIL: test_post_list (blog.tests.TestView.test_post_list) ->         <a class="navbar-brand" href="/">BLOG with Django</a> 정상인데?
+아하
+복붙수정하면서 아래처럼 썼는데
+        logo_btn = navbar.find('a', text='BLOG with Django')
+        self.assertEqual(logo_btn.attrs['href'], '/') 
+        blog_btn = navbar.find('a', text='Blog')
+        self.assertEqual(logo_btn.attrs['href'], '/blog') <-여기를 수정해야 했던거.
+        about_me_btn = navbar.find('a', text='AboutMe')
+최종적으로 url에 /blog/, /about_me/등으로 뒤에 슬래시 넣어주는 것까지 수정해서 test ok
+
+17일차
+기존 main-area 와 그 외 파트 모듈화 -> extends(확장)으로 모듈화
+navbar, footer 모듈화 -> include로 함
+이미 모듈화 결과를 확인할 test파트의 수정은 마쳤으니, 모듈화 작업 진행(navbar.html)
+Q : 교재에서는 nav 태그와 그 아래 modal관련 내용을 모두 넣으라는데, 내 자료는 modal 항목이 없음. 검색 돌려도 없다. 
+그냥 사용한 거 차이고, 모달 항목이 로그인, 로그아웃, 회원가입 등임.
+test-ok
+해야할 일
+1. 포스트 리스트에서 페이지 넘기는 거 포스트 수 맞춰서 뜨게 하고 링크 연결 기능.
+2. 오른쪽 서치, 카테고리, 사이드 위젯 등 처리
+3. 모달 기능(나중에 auther쓰려면 필요)만들기
 

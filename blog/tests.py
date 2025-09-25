@@ -15,12 +15,8 @@ class TestView(TestCase):
         # 1.3 페이지 타이틀은 'Blog Home'이다.
         soup = BeautifulSoup(response.content, 'html.parser')
         self.assertEqual(soup.title.text, 'Blog Home')
-        # 1.4 내비게이션 바가 있다.
-        navbar = soup.nav
-        # 1.5 Landing, About Me, Blog 라는 문구가 내비게이션 바에 있다.
-        self.assertIn('Blog', navbar.text)
-        self.assertIn('AboutMe', navbar.text)
-        self.assertIn('Landing', navbar.text)
+        #navbar는 navbar_test로 이관
+        self.navbar_test(soup)
 
         # 2.1 메인 영역에 게시물이 하나도 없다면
         self.assertEqual(Post.objects.count(),0)
@@ -64,10 +60,7 @@ class TestView(TestCase):
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
         # 2.2 포스트 목록 페이지와 같은 네비게이션 바 존재.
-        navbar = soup.nav
-        self.assertIn('Blog', navbar.text)
-        self.assertIn('AboutMe', navbar.text)
-        self.assertIn('Landing', navbar.text)
+        self.navbar_test(soup)
         # 2.3 첫 번째 포스트의 제목이 탭 타이틀에 존재.
         self.assertIn(post_001.title, soup.title.text)
         # 2.4 첫 번째 포스트의 제목이 포스트 영역에 있다.
@@ -78,3 +71,20 @@ class TestView(TestCase):
         # 2.5 첫 번째 포스트의 작성자가 포스트 영역에 있다(아직 x)
         # 첫 번째 포스트의 내용이 포스트 영역에 있다.
         self.assertIn(post_001.content, post_area.text)
+
+    def navbar_test(self, soup):
+        # 1.1 내비게이션 바가 있다.
+        navbar = soup.nav
+        # 1.2 Landing, About Me, Blog 라는 문구가 내비게이션 바에 있다.
+        self.assertIn('Blog', navbar.text)
+        self.assertIn('AboutMe', navbar.text)
+        self.assertIn('Landing', navbar.text)
+        # 1.3 navbar의 버튼들이 정상적으로 링크를 연결하는가?
+        logo_btn = navbar.find('a', text='BLOG with Django')
+        self.assertEqual(logo_btn.attrs['href'], '/')
+        blog_btn = navbar.find('a', text='Blog')
+        self.assertEqual(blog_btn.attrs['href'], '/blog/')
+        about_me_btn = navbar.find('a', text='AboutMe')
+        self.assertEqual(about_me_btn.attrs['href'], '/about_me/')
+        landing_btn = navbar.find('a', text='Landing')
+        self.assertEqual(landing_btn.attrs['href'], '/')
