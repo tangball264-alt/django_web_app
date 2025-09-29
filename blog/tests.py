@@ -1,11 +1,14 @@
 from django.test import Client, TestCase
 from bs4 import BeautifulSoup
 from .models import Post
+from django.contrib.auth.models import User
 
 # Create your tests here.
 class TestView(TestCase): 
     def setUp(self):
         self.client = Client()
+        self.user_eddi = User.objects.create_user(username='eddi',password='somepassword')
+        self.user_tangball = User.objects.create_user(username='tangball',password='somepassword')
 
     def test_post_list(self): #index_template 화면인 localhost/blog 페이지의 테스트 코드
         # 1.1 포스트 목록 페이지를 가져온다.
@@ -28,10 +31,12 @@ class TestView(TestCase):
         post_001 = Post.objects.create(
             title='첫 번째 포스트입니다.',
             content='Hello World. We are the world.',
+            author=self.user_tangball,
         )
         post_002 = Post.objects.create(
             title='두 번째 포스트입니다.',
             content='함께 테스트 페이지를 만들어 보아요..',
+            author=self.user_eddi,
         )
         self.assertEqual(Post.objects.count(),2)
         # 3.2 포스트 목록 페이지를 새로고침 했을 때
@@ -44,12 +49,16 @@ class TestView(TestCase):
         self.assertIn(post_002.title, main_area.text)
         # 3.4 '아직 작성된 포스트가 없습니다.'라는 문구는 보이지 않는다.
         self.assertNotIn('아직 작성된 포스트가 없습니다.', main_area.text)
+        # 3.5 각 작성자가 메인 에리어에 존재한다.
+        self.assertIn(self.user_eddi.username.upper(), main_area.text)
+        self.assertIn(self.user_tangball.username.upper(), main_area.text)
 
     def test_post_detail(self):
         # 1.1 포스트가 하나 있다.(하나의 테스트용 포스트를 생성)
         post_001 = Post.objects.create(
             title = '첫 번째 포스트입니다.',
-            content = '누구든지 체포 또는 구속을 당한 때에는 즉시 변호인의 조력을 받을 권리를 가진다. 다만, 형사피고인이 스스로 변호인을 구할 수 없을 때에는 법률이 정하는 바에 의하여 국가가 변호인을 붙인다. 대통령은 헌법과 법률이 정하는 바에 의하여 공무원을 임면한다. 국회의원은 법률이 정하는 직을 겸할 수 없다. 국회에서 의결된 법률안은 정부에 이송되어 15일 이내에 대통령이 공포한다. 선거와 국민투표의 공정한 관리 및 정당에 관한 사무를 처리하기 위하여 선거관리위원회를 둔다. 선거운동은 각급 선거관리위원회의 관리하에 법률이 정하는 범위안에서 하되, 균등한 기회가 보장되어야 한다.대통령의 선거에 관한 사항은 법률로 정한다. 일반사면을 명하려면 국회의 동의를 얻어야 한다. 헌법에 의하여 체결·공포된 조약과 일반적으로 승인된 국제법규는 국내법과 같은 효력을 가진다.'
+            content = '누구든지 체포 또는 구속을 당한 때에는 즉시 변호인의 조력을 받을 권리를 가진다. 다만, 형사피고인이 스스로 변호인을 구할 수 없을 때에는 법률이 정하는 바에 의하여 국가가 변호인을 붙인다. 대통령은 헌법과 법률이 정하는 바에 의하여 공무원을 임면한다. 국회의원은 법률이 정하는 직을 겸할 수 없다. 국회에서 의결된 법률안은 정부에 이송되어 15일 이내에 대통령이 공포한다. 선거와 국민투표의 공정한 관리 및 정당에 관한 사무를 처리하기 위하여 선거관리위원회를 둔다. 선거운동은 각급 선거관리위원회의 관리하에 법률이 정하는 범위안에서 하되, 균등한 기회가 보장되어야 한다.대통령의 선거에 관한 사항은 법률로 정한다. 일반사면을 명하려면 국회의 동의를 얻어야 한다. 헌법에 의하여 체결·공포된 조약과 일반적으로 승인된 국제법규는 국내법과 같은 효력을 가진다.',
+            author=self.user_eddi,
         )
         # 1.2 그 포스트의 url은 '/blog/1/'이다(생성한 포스트의 url 확인.)
         self.assertAlmostEqual(post_001.get_absolute_url(),'/blog/1/')
@@ -68,8 +77,9 @@ class TestView(TestCase):
         post_area = main_area.find('article', id='post-area')
         comment_area = main_area.find('section', id='comment-area')
         self.assertIn(post_001.title, post_area.text)
-        # 2.5 첫 번째 포스트의 작성자가 포스트 영역에 있다(아직 x)
-        # 첫 번째 포스트의 내용이 포스트 영역에 있다.
+        # 2.5 첫 번째 포스트의 작성자가 포스트 영역에 있다.
+        self.assertIn(self.user_eddi.username.upper(), post_area.text)
+        # 2.6 첫 번째 포스트의 내용이 포스트 영역에 있다.
         self.assertIn(post_001.content, post_area.text)
 
     def navbar_test(self, soup):
