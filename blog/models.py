@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 class Post(models.Model):#데이터베이스 테이블로 이 데이터들을 관리하겠다 -> models.Model
     title = models.CharField(max_length = 50)
     content = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE) #현재는 '유저 삭제 시 포스트 함께 삭제.'
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True) #유저 삭제 시 포스트의 '작성자'값을 null로 변경.
+#    author = models.ForeignKey(User, on_delete=models.CASCADE) #'유저 삭제 시 포스트 함께 삭제.'
     created_at = models.DateTimeField(auto_now_add=True) #필드가 생성될 때 한번만 현재시간 작성.
     changed_at = models.DateTimeField(auto_now=True) #필드 저장시마다 현재시간으로 갱신.
     head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d/',blank=True)#헤드 이미지. 이미지 필드를 사용. blog/images/연도(4자리)/월/일로 폴더 만들어 분류해 업로드. 안 올려도 됨.
