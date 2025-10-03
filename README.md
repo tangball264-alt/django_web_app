@@ -341,3 +341,84 @@ test-ok. runserver후 디자인 확인 ok
 저장
 
 
+20일차
+카테고리 기능 구현하기
+모델에 category 모델 만들기 : 이건 지금처럼 def로 함수 만들거나 속성 하나를 만드는 게 아니라 하나의 class를 새로 만드는 것.
+속성은 이름과 slug
+Q : slug가 뭐지? SlugField는 뭐야?
+향후 출력 시 이름만 받도록 __str__메서드 작성.
+포스트 모델에 외래키로 카테고리 추가.
+* 오류 로그 : makemigration 시도 시 NameError: name 'Category' is not defined 에러 발생
+    왜? : 기존 Post 모델 밑에 Category 모델 작성 + Post에 ForeignKey 추가 -> 앞에부터 읽으니 카테고리를 읽기 전, 포스트에서 '카테고리' 모델이 없다고 오류를 띄움.
+          그러니 카테고리 모델을 포스트 모델보다 위로 올림. 즉시 해결.
+마이그레이션 진행 후 
+admin.py에 category 모델 등록
+기존 admin.py는 기본 제공인 groups, users 외에 blog에서 제공하는 post 항목 해서 보이게 해둔 게 전부임.
+이번에는 이전에 언급만 한 #class PostAdmin(admin.modeladmin) 해서 일부 데이터만 보이도록 할 수 있음. 을 이용.
+카테고리 어드민으로 자동으로 slug 채움.
+Categorys 출력 확인. 추가로 원래도 '최근 활동' 이 있었나? 
++Categorys말고 Categories로 변경해야 함. models.py에서 카테고리 모델 안에서 meta 클래스를 작성 -> 이 모델의 메타 설정을 직접 건드려 복수형 수정.
+        verbose_name_plural = 'Categories'
+실행해서 카테고리 작성. slug는 적합하지 않은 글자는 자동으로 변환해서 형태 조정함.
+포스트 모델 수정해서 blank=true 추가
+포스트에 카테고리 작성함. 이제 이 작성된 db 내용을 확인해야 하는데, html파일에서 출력을 작성 안함 -> 장고 셸로 DB 살펴보기
+>> python manage.py shell
+교재 313쪽부터 셸로 쓰는 다양한 명령 보여주니 참고.     기본적으로 파이썬 같네.
+이를 더 편하게 보기 위해 '셸 플러스'를 이용하면 더 좋다.
+>> pip install django_extentions
+>> pip install ipython
+settings.py의 install_apps에 django_extensions 추가.
+이제 아래 명령어로 셸 플러스를 실행 가능
+>> python manage.py shell_plus
+이전 줄 수정도 되고 되게 편하다.
+In [1]: for p in Post.objects.all():
+   ...:     print(f'{p} :: category - {p.category}')
+이것저것 확인 다 하며 포스트 목록 페이지 수정해야 함.
+기본적으로 카테고리 위젯이 있으니, 그거 기반 수정.
+우선 구상을 기반으로 test부터 수정하고
+category_widget_test()함수를 따로 만드는데
+Q : 왜 이거를 setup(self)안에 만들지? 다른 것들은 이 함수 바깥에 만들던데?
+A : 지금 251쪽 보면 def setUp(self): 와 def test_post_list(self):는 같은 라인 그런데 321쪽에서는 이 둘이 하나씩 뒤로 밀려 있음. 
+    나는 일단 기존의 class 바로 아래 높이로 모든 def를 맞출 것. 321쪽이 오류라고 판단하기로. 지금껏 정상 작동함.
+test 수정 내용 : 
+    setup에 카테고리 2개 만들고, 포스트도 여기서 3개 만든다.
+    category_widget_test(self, soup)를 새로 만들고
+    test_post_list(self)의 내용을 대폭 수정.
+        -기본적으로 setup에서 포스트를 3개나 만들어 둔 채이기 때문에, '포스트 없는'상태를 먼저 체크할 수 없음
+        -따라서, 포스트가 3개 있는 상태를 먼저 체크
+        -+ 그 전에 navbar 테스트 함수와 category widget 테스트 함수를 soup 을 주면서 실행시키고
+        -포스트가 있는 상태에서의 확인이 다 끝난 후, Post.objects.all().delete()를 이용해 포스트 개수를 0로 만들어 포스트가 없는 상태 확인
+그리고 이제 html 파일에서 div 요소를 부여
+views에서 category도 import 하고, 카테고리 위젯을 위한 정보 받아오기
+** 내 views가 교재와 다른 점이 많으니 나중에 수정 필요 **
+카테고리 위젯을 base로 옮기기. - 기존에는 <div class="container" id="main-area"> 바로 아래부터 블록했으나, 그 아래 div class=row 밑부터 블록으로 수정.
+base에서 카테고리 위젯에 categories 정보 출력. -> base에 카테고리가 있으니 post_list 것 말고도 post_detail것도 수정되는데, 그 쪽은 카테고리 정보를 받아오도록 view 수정을 하지 않아서, 정상 작동하지 않음. 나중에 윗윗줄에서 말했듯 view 수정 들어가야 함.
+카테고리 링크 -> 해당하는 포스트만 목록으로 보여주기. 아직 구현 x.
+
+test - failed
+왜 안되는거지?
+ERROR: test_post_list (blog.tests.TestView.test_post_list)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 65, in test_post_list
+    self.assertIn(self.post_001.title, post_001_card.text)
+                  ^^^^^^^^^^^^^
+AttributeError: 'TestView' object has no attribute 'post_001'
+>> <div class="card mb-4" id="post-{{post_list.0.pk}}">랑 <div class="card mb-4" id="post-{{p.pk}}">를 했는데?
+* 오류 로그 : 테스트 실행했는데 setUp에서 생성한 post_001을 포함한 포스트들을 다른 test의 함수들이 인식하지 못함
+    왜?   : setUp에서 post 생성할 때, 나는 지역변수(post_001 = Post.objects.create())로 생성. self.post_001로 생성해야 정상 작동
+이제 test상의 문제는 처리되었고, 니머지는 테스트와 html 간의 차이 찾아 html을 수정해야 함.
+    포스트 카드에서 카테고리 이름과 같은 텍스트가 발견되지 않음. -> card-body에 span태그로 뱃지를 부착.
+    부트스트랩 사이트에서 가져온 <span class="badge rounded-pill text-bg-info">Info</span> 이거 사용할 것. 나중에는 카테고리 모델에 '색'항목을 추가한 다음, 카테고리별로 다른 색을 붙여도 좋을 듯
++작성일을 이전에 card-body위에 했는데, 카테고리가 이거랑 같이 쓰니까 줄바꿈이 되어 시각적으로 별로. 못생김.
+    따라서 한 줄 안에 쓸 수 있도록 gpt에게 물어 부트스트랩 유틸리티 클래서(flex)를 사용하는 형태로 수정.
+    <div class="d-flex align-items-center">
+        <div class="small text-muted me-2">{{ p.created_at }}</div>
+        <span class="badge rounded-pill text-bg-info">{{ p.category }}</span>
+    </div>
+교재는 float-right로 오른쪽 끝에 배치하는데, 
+메인은 <span class="badge badge-secondary float-right">{{ p.category }}</span> 이거 쓰고
+근데 나는 이거 하면 안뜨는게, 부트스트랩 4에만 있는 부분같아. float-end로 float-right를 대신할 수 있대.
+이거 사용 시 제목 공간의 우상단 일부를 사용하게 되는데, 대부분은 기존에 내가 선택한 방식이 더 마음에 들고, 큰 카드로 보여주는 부분만 이거 적용하기로.
+test-ok
+추가적으로 교재는 카테고리 목록을 옆에 점 붙이는데, 나는 없는 게 예뻐보여서 그대로 둘 것.
