@@ -422,3 +422,15 @@ AttributeError: 'TestView' object has no attribute 'post_001'
 이거 사용 시 제목 공간의 우상단 일부를 사용하게 되는데, 대부분은 기존에 내가 선택한 방식이 더 마음에 들고, 큰 카드로 보여주는 부분만 이거 적용하기로.
 test-ok
 추가적으로 교재는 카테고리 목록을 옆에 점 붙이는데, 나는 없는 게 예뻐보여서 그대로 둘 것.
+평소에 test를 
+python manage.py test blog.tests.TestView.test_post_list   로 하는 대신 걍 평소에 test를 python manage.py test로 했더니 하다가 post_detail 테스트도 수정 마침.
+get_contextdata를 postdetail 클래스에 추가.
+
+views 수정하기
+173p까지는 기존의 def 방식 사용.
+아, 9일차에 CBV로 포스트 목록 페이지 만들기를 하면서 발생한 문제였다.
+193페이지 내용을 참고하여 수정.
+-views.py, urls.py 수정.
+-정상적으로 실행됨.
+그리고 335p로 돌아와, views.py에 get_context_data를 postdetail클래스에도 복사-붙여넣기
+tests.py에서 post_list 부분에서도 카테고리 위젯과 포스트의 카테고리 출력 테스트하게 함.

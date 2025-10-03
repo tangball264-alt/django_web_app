@@ -107,6 +107,8 @@ class TestView(TestCase):
         soup = BeautifulSoup(response.content, 'html.parser')
         # 2.2 포스트 목록 페이지와 같은 네비게이션 바 존재.
         self.navbar_test(soup)
+        #category는 category_widget_test로 이관
+        self.category_widget_test(soup)
         # 2.3 첫 번째 포스트의 제목이 탭 타이틀에 존재.
         self.assertIn(self.post_001.title, soup.title.text)
         # 2.4 첫 번째 포스트의 제목이 포스트 영역에 있다.
@@ -118,6 +120,8 @@ class TestView(TestCase):
         self.assertIn(self.user_tangball.username.upper(), post_area.text)
         # 2.6 첫 번째 포스트의 내용이 포스트 영역에 있다.
         self.assertIn(self.post_001.content, post_area.text)
+        # 첫 번째 포스트의 카테고리 = music이 포스트 영역에 있다.
+        self.assertIn(self.category_music.name, post_area.text)
 
     def navbar_test(self, soup):
         # 1.1 내비게이션 바가 있다.

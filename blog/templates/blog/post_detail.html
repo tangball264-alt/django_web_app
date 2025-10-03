@@ -8,6 +8,12 @@ Blog Post - {{post.title}}
     <div class="col-lg-8">
         <!-- Post content-->
         <article id="post-area">
+            <!--이 포스트의 카테고리-->
+            {% if post.category %}
+                <span class="badge rounded-pill text-bg-info">{{ post.category }}</span>
+            {% else %}
+                <span class="badge rounded-pill text-bg-info float-end">미분류</span>  
+            {% endif %}
             <!-- Post header-->
             <header class="mb-4">
                 <!-- Post title-->
