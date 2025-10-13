@@ -458,4 +458,43 @@ test - failed : test_category_page()에 self.assertIn(self.category_programming.
 views.py의 category_page함수에서 if-else문 사용.
 
 22일차
-카테고리 페이지 이어서.
+카테고리 페이지 이어서. 
+오류 발생. 정확히는 모르겠지만, views.py의 카테고리 페이지 함수에서 
+    else :
+        post_list =  Post.objects.filter(category=category)
+        category = Category.objects.get(slug=slug)
+    이렇게 쓴 거를 else안의 두 줄 순서 바꿈.
+    아마 post_list 정의에 category값이 필요한데 둘 순서를 잘못 둔 탓에 카테고리가 없어서 인듯.
+수정 후 저장.
+
+다대다 관계를 이용하여 tag모델 만들기
+기본적으로는 카테고리 모델을 복붙해 쓰되, 복수형을 수정할 필요는 없으니 meta클래스만 삭제
+이렇게 name, slug 필드 갖고 str과 url 함수가 있는 tag 모델 작성. 
+post모델에 tag 필드 추가 -> 외래키가 아니라 manytomanyfield로 작성.
+보통 만들 때 관계형 db 생각하면 이런 다대다 관계는 릴레이션이 '포스트', '태그', '포스트-태그' 해서 3개로 분리하는 게 정석일 텐데, 다대다 관계 전용 필드 형식이 있다니
+    참고로 ManyToManyField로 만든 필드는 기본적으로 null=True 설정이기에 필드에 그걸 포함하면  WARNINGS: blog.Post.tag: (fields.W340) null has no effect on ManyToManyField. 같은 식으로 경고함.
+이제 태그를 관리자 페이지에서 보고 사용하도록 admin.py 변경 : 카테고리의 클래스categoryadmin까지 복붙하여 tag로 수정(import도 하고)
+
+테스트 코드 수정. (포스트 리스트)
+post_list 수정 -> 왜 안됨?
+        self.assertIn(self.tag_hello.name, post_001_card.text)
+        이렇게 써야 정상인데 self.tag_hello만 쓰니 문자열 A가 문자열 B에 포함되었는가? 가 아니라 태그 A가 문자열 B에 포함되었는가? 가 된 것.
+        형식을 맞추어 name으로 해야 함.
+폰트어썸 삽입 안됨. 기존 교재 복붙했더니 배지가 부트스트랩 버전 변경으로 안나와서 문제였음.
+일단 대충 처리했는데 시각적으로 별로이니 수정해야.
+이전의 줄바꿈 생략인 
+    <div class="d-flex align-items-center">
+    이거 사용하려고 했는데, 줄바꿈 외에도 자연스러운 공백까지 생략해서 별로임.
+
+폰트어썸 가입 후 사용으로 방향 결정.
+이 프로젝트 파일을 저장한 github계정이 고다영(tangball264) 구글계정을 연동하여 로그인하므로, 같은 이메일로 폰트어썸 무료 계정 생성.
+kit code 를 포함한 내 kit 만듦.
+정상작동 확인. 향후 디자인 수정 권장. 
+test-failed. 왜?
+post-list에서 이미지 유무에 따라 다르게 했는데, 이 분리 과정에서 '이미지 있을 때' 버전에만 태그 추가함. 수정.
+test-ok
+
+테스트 코드 수정(상세페이지)
+post_detail.html도 수정.
+test-ok
+저장

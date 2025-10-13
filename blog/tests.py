@@ -1,6 +1,6 @@
 from django.test import Client, TestCase
 from bs4 import BeautifulSoup
-from .models import Post, Category
+from .models import Post, Category, Tag
 from django.contrib.auth.models import User
 
 # Create your tests here.
@@ -11,6 +11,9 @@ class TestView(TestCase):
         self.user_tangball = User.objects.create_user(username='tangball',password='somepassword')
         self.category_programming = Category.objects.create(name='programming', slug='programming')
         self.category_music = Category.objects.create(name='music', slug='music')
+        self.tag_python_kor = Tag.objects.create(name='파이썬 공부', slug='파이썬-공부')
+        self.tag_python = Tag.objects.create(name='python', slug='python')
+        self.tag_hello = Tag.objects.create(name='hello', slug='hello')
     
         self.post_001 = Post.objects.create(
             title='첫 번째 포스트입니다.',
@@ -18,6 +21,8 @@ class TestView(TestCase):
             author=self.user_tangball,
             category=self.category_music,
         )
+        self.post_001.tags.add(self.tag_hello)
+
         self.post_002 = Post.objects.create(
             title='두 번째 포스트입니다.',
             content='함께 테스트 페이지를 만들어 보아요..',
@@ -29,6 +34,10 @@ class TestView(TestCase):
             content='이번 포스트는 카테고리가 없어요.',
             author=self.user_eddi,
         )
+
+
+        self.post_003.tags.add(self.tag_python_kor)
+        self.post_003.tags.add(self.tag_python)
 
     def category_widget_test(self, soup):
         categories_widget = soup.find('div', id='categories-widget')
@@ -64,16 +73,28 @@ class TestView(TestCase):
         post_001_card = main_area.find('div', id='post-1')
         self.assertIn(self.post_001.title, post_001_card.text)
         self.assertIn(self.post_001.category.name, post_001_card.text)
+        #포스트카드1의 태그
+        self.assertIn(self.tag_hello.name, post_001_card.text)
+        self.assertNotIn(self.tag_python.name, post_001_card.text)
+        self.assertNotIn(self.tag_python_kor.name, post_001_card.text)
 
         #각 포스트 카드 점검 -2
         post_002_card = main_area.find('div', id='post-2')
         self.assertIn(self.post_002.title, post_002_card.text)
         self.assertIn(self.post_002.category.name, post_002_card.text)
+        #포스트카드2의 태그
+        self.assertNotIn(self.tag_hello.name, post_002_card.text)
+        self.assertNotIn(self.tag_python.name, post_002_card.text)
+        self.assertNotIn(self.tag_python_kor.name, post_002_card.text)
 
         #각 포스트 카드 점검 -3
         post_003_card = main_area.find('div', id='post-3')
         self.assertIn(self.post_003.title, post_003_card.text)
         self.assertIn('미분류', post_003_card.text)
+        #포스트카드3의 태그
+        self.assertNotIn(self.tag_hello.name, post_003_card.text)
+        self.assertIn(self.tag_python.name, post_003_card.text)
+        self.assertIn(self.tag_python_kor.name, post_003_card.text)
 
         #각 작성자 이름 확인
         self.assertIn(self.user_tangball.username.upper(), main_area.text)
@@ -122,6 +143,10 @@ class TestView(TestCase):
         self.assertIn(self.post_001.content, post_area.text)
         # 첫 번째 포스트의 카테고리 = music이 포스트 영역에 있다.
         self.assertIn(self.category_music.name, post_area.text)
+        # 첫 번째 포스트의 태그 = hello가 포스트 영역에 있다. 다른 두 태그는 없다.
+        self.assertIn(self.tag_hello.name, post_area.text)
+        self.assertNotIn(self.tag_python.name, post_area.text)
+        self.assertNotIn(self.tag_python_kor.name, post_area.text)
 
     def navbar_test(self, soup):
         # 1.1 내비게이션 바가 있다.

@@ -22,6 +22,16 @@
                     {% endif %}
                     <h2 class="card-title">{{ post_list.0.title }}</h2>
                     <p class="card-text">{{ post_list.0.content }}</p>
+                    
+                    {% if post_list.0.tags.exists %}
+                        <i class="fa-regular fa-tags" style="color: #74C0FC;"></i>
+                        {% for tag in post_list.0.tags.iterator %}
+                            <a href="{{ tag.get_absolute_url }}"><span class="badge text-bg-secondary">{{tag}}</span></a>
+                        {% endfor %}
+                        <br/>
+                        <br/>
+                    {% endif %}
+
                     <a class="btn btn-primary" href="{{post_list.0.get_absolute_url}}">Read more →</a>
                 </div>
                 <div class="card-footer text-muted">
@@ -53,6 +63,14 @@
     
                             <h2 class="card-title">{{ p.title }}</h2>
                             <p class="card-text">{{ p.content | truncatewords:15}}</p>
+                            {% if p.tags.exists %}
+                                <i class="fa-regular fa-tags" style="color: #74C0FC;"></i>
+                                {% for tag in p.tags.iterator %}
+                                    <a href="{{ tag.get_absolute_url }}"><span class="badge text-bg-secondary">{{tag}}</span></a>
+                                {% endfor %}
+                                <br/>
+                                <br/>
+                            {% endif %}
                             <a class="btn btn-primary" href="{{p.get_absolute_url}}">Read more →</a>
                         </div>
                         <div class="card-footer text-muted">
@@ -71,6 +89,14 @@
                             </div>
                             <h2 class="card-title">{{ p.title }}</h2>
                             <p class="card-text">{{ p.content | truncatewords:50}}</p>
+                            {% if p.tags.exists %}
+                                <i class="fa-regular fa-tags" style="color: #74C0FC;"></i>
+                                {% for tag in p.tags.iterator %}
+                                    <a href="{{ tag.get_absolute_url }}"><span class="badge text-bg-secondary">{{tag}}</span></a>
+                                {% endfor %}
+                                <br/>
+                                <br/>
+                            {% endif %}
                             <a class="btn btn-primary" href="{{p.get_absolute_url}}">Read more →</a>
                         </div>
                         <div class="card-footer text-muted">
