@@ -140,4 +140,21 @@ class TestView(TestCase):
         landing_btn = navbar.find('a', text='Landing')
         self.assertEqual(landing_btn.attrs['href'], '/')
     
+    def test_category_page(self):
+        response = self.client.get(self.category_programming.get_absolute_url())
+        self.assertEqual(response.status_code,200)
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.navbar_test(soup)
+        self.category_widget_test(soup)
+
+        main_area = soup.find('div', id='main-area')
+
+        h1_tag = main_area.find('h1')
+        self.assertIn(self.category_programming.name, h1_tag.text)
+
+        self.assertIn(self.category_programming.name, main_area.text)
+        self.assertNotIn(self.post_001.title, main_area.text)
+        self.assertIn(self.post_002.title, main_area.text)
+        self.assertNotIn(self.post_003.title, main_area.text)
 

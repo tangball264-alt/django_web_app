@@ -16,6 +16,9 @@ class Category(models.Model):
     
     class Meta:
         verbose_name_plural = 'Categories'
+    
+    def get_absolute_url(self):
+        return f'/blog/category/{self.slug}/'
 
 class Post(models.Model):#데이터베이스 테이블로 이 데이터들을 관리하겠다 -> models.Model
     title = models.CharField(max_length = 50)

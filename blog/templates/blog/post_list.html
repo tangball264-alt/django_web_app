@@ -1,6 +1,7 @@
 {% extends 'blog/base.html' %} <!-- base.html을 확장해 이 html에 넣기. -->
 {% block main_area %}
     <!-- Blog entries-->
+        <h1>Blog {% if category %} <span class="badge rounded-pill text-bg-info"> {{ category }} </span> {% endif %}</h1>
 
         <div class="col-lg-8"><!--포스트 목록은 전체 가로 12 중 8 크기.-->
             <!-- Featured blog post-->

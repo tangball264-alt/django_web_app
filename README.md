@@ -434,3 +434,28 @@ views 수정하기
 -정상적으로 실행됨.
 그리고 335p로 돌아와, views.py에 get_context_data를 postdetail클래스에도 복사-붙여넣기
 tests.py에서 post_list 부분에서도 카테고리 위젯과 포스트의 카테고리 출력 테스트하게 함.
+
+
+21일차
+카테고리 창 만들기
+- 테스트 수정(카테고리 창을 위한 테스트 함수 별도 작성)
+- models.py에서 카테고리에 get_absolute_url 함수 추가.
+- urls.py에 위에서 지정한 url대로 카테고리창의 url 작성.
+- urls에서 views.category_page로 주소에 포함된 slug를 넘기기로 했으니, views.py에 category_page()함수를 만든다. -> CBV에 따른 클래스 하위의 메서드가 아니라, FBV방식에 따라 클래스 바깥에 함수로 만들기.
+- 큰 틀은 blog/post_list.html을 이용하되, 주어지는 포스트 정보를 필터링하는 형태로 간다.
+- post_list.html 파일을 수정해 카테고리를 받을 때, 이를 h1  에서 배지 형태로 출력.
+test - failed : views에서 render(request, html템플릿 주소, 기타)순으로 써야 하는데 request 빼먹음
+test - failed : test_category_page()에 self.assertIn(self.category_programming.name, soup.h1.text) 라는 내용이 있는데, 이건 교재 예시에서는 <h1>이 페이지 전체에 한 번만 쓰이기 때문. 하지만 내가 고른 템플릿은 base.html의 헤더에 h1태그가 쓰이므로, 앞에 사용된 h1태그만을 인식하여 오류가 발생. h1_tag = main_area.find('h1') 를 추가하고, soup.h1.text대신 h1_tag.text로 수정하여 대상을 좁히는 방식으로 임시 변경. 이는 후일 디자인을 변경할 수 있다
+-> header 부분에 'Blog' 와 '카테고리 뱃지'가 들어가도록 수정하거나?
+-> 혹은 예시처럼 헤더 부분을 간소화하던가.
+일단 테스트를 다음처럼 수정.
+        h1_tag = main_area.find('h1')
+        self.assertIn(self.category_programming.name, h1_tag.text)
+
+        self.assertIn(self.category_programming.name, main_area.text)
+
+현재는 '미분류' 카테고리 페이지 동작 x.
+views.py의 category_page함수에서 if-else문 사용.
+
+22일차
+카테고리 페이지 이어서.
