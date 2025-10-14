@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
-from .models import Post, Category
+from .models import Post, Category, Tag
 
 
 # Create your views here.
@@ -39,5 +39,21 @@ def category_page(request, slug): #위의 둘과 달리 FBV 방식. 필수인 re
             'categories': Category.objects.all(),
             'no_category_post_count': Post.objects.filter(category=None).count,
             'category': category,
+        }
+    )
+
+def tag_page(request, slug): #FBV 방식. 필수인 request와 추가적으로 slug를 매개변수로 받는다.
+    
+    tag = Tag.objects.get(slug=slug)
+    post_list =  tag.post_set.all()
+
+    return render(
+        request,
+        'blog/post_list.html',
+        {
+            'post_list': post_list,
+            'tag' : tag,
+            'categories': Category.objects.all(),
+            'no_category_post_count': Post.objects.filter(category=None).count,
         }
     )

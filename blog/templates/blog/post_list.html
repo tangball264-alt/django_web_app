@@ -1,8 +1,7 @@
 {% extends 'blog/base.html' %} <!-- base.html을 확장해 이 html에 넣기. -->
 {% block main_area %}
     <!-- Blog entries-->
-        <h1>Blog {% if category %} <span class="badge rounded-pill text-bg-info"> {{ category }} </span> {% endif %}</h1>
-
+        
         <div class="col-lg-8"><!--포스트 목록은 전체 가로 12 중 8 크기.-->
             <!-- Featured blog post-->
             <!-- 포스트 리스트 -->
@@ -24,7 +23,7 @@
                     <p class="card-text">{{ post_list.0.content }}</p>
                     
                     {% if post_list.0.tags.exists %}
-                        <i class="fa-regular fa-tags" style="color: #74C0FC;"></i>
+                        <i class="fa-regular fa-tags"></i>
                         {% for tag in post_list.0.tags.iterator %}
                             <a href="{{ tag.get_absolute_url }}"><span class="badge text-bg-secondary">{{tag}}</span></a>
                         {% endfor %}
