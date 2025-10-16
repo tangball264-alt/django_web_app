@@ -8,5 +8,6 @@ urlpatterns = [
     path('<int:pk>/', views.PostDetail.as_view()),
     # path('<int:pk>/',views.single_post_page), FBV 방식 때 쓰던 거. CBV 방식으로 변경했으니 불필요.
     path('category/<str:slug>/', views.category_page),
-    path('tag/<str:slug>/', views.tag_page)
+    path('tag/<str:slug>/', views.tag_page),
+    path('create_post/', views.PostCreate.as_view()),
 ]

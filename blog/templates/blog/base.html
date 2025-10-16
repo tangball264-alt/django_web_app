@@ -21,6 +21,7 @@
          {% include 'blog/navbar.html' %}
         
         <!-- Page header with logo and tagline-->
+        {% block header_text %}
         {% if category %}
         <div class="container my-5">
             <h1>Blog <span class="badge rounded-pill text-bg-info">{{ category }}</span></h1>
@@ -41,11 +42,14 @@
             </div>
         </header>
         {% endif %}
+        {% endblock %}
         <!-- Page content-->
-        <div class="container" id="main-area">
+        <div class="container">
             <div class="row">
-                {% block main_area %}
-                {% endblock %}
+                <div class="col-lg-8" id="main-area">
+                    {% block main_area %}
+                    {% endblock %}
+                </div>
 
 
                 <!-- Side widgets-->

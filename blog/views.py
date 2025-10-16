@@ -1,5 +1,6 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.shortcuts import redirect, render
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Post, Category, Tag
 
 
@@ -22,6 +23,18 @@ class PostDetail(DetailView):
         context['categories'] = Category.objects.all()
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
         return context
+    
+class PostCreate(LoginRequiredMixin,CreateView):
+    model = Post
+    fields = ['title', 'content', 'head_image', 'attachment', 'category']
+
+    def form_valid(self, form):
+        current_user = self.request.user
+        if current_user.is_authenticated:
+            form.instance.author = current_user
+            return super().form_valid(form)
+        else : 
+            return redirect('/blog/')
 
 def category_page(request, slug): #위의 둘과 달리 FBV 방식. 필수인 request와 추가적으로 slug를 매개변수로 받는다.
     if slug == 'no_category':

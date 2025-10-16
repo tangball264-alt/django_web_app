@@ -508,3 +508,67 @@ test-ok
 
 23일차
 전일 한 태그 페이지 저장
+포스트 작성 페이지 만들기
+-이건 로그인 페이지도 만들어서 로그인 기능을 구현하면 Author를 자동입력할 수 있을텐데. 일단 나중에 한다고 치자
+-교재에서는 로그인 페이지는 만들었지만 기능은 아직이고
+
+포스트 작성 페이지는 유저가 내용을 입력할 빈 칸(=폼)이 필요.
+과정
+1. 테스트 코드 def test_create_post(self)작성하기
+2. views.py와 urls.py에 포스트 작성 페이지 관련 내용 추가
+3. 포스트 작성 페이지를 위한 html 작성하기
+4. test-ok
+
+{% csrf_token %} : 장고가 제공하는 'csrf 공격' 방어 기능. 폼 태그 안에 넣기.
+방문자의 입력값을 서버에 전달하는 방법 : Post와 Get. get의 경우 보다 간단하지만 길이제한 등이 있다.
+
+실제 runserver 결과 서치랑 카테고리가 폼 옆이 아니라 밑에 붙어 나옴. 
+다른 두 파일(포스트리스트, 포스트 디테일.html)에서는 
+    <div class="col-lg-8"> 가 존재. 
+    아마 교재에서는 이게 main-area 바깥 부분인듯. 나도 동일하게 수정한다.
+그리고 위젯과 h1 모두 너무 위에 붙어 header 부분에 br(원래 hr하려고 했는데 그거는 줄 생기는 거라 바꿈)2개 추가.
+폼 디자인 별로인데 수정 필요.
+
+기본 폼의 형태가 교재랑 다른데 이에 대해서는 별도로 검색해야 할 듯. 오늘은 여기까지.
+
+24일차
+어제 이어서, 폼 디자인 변경.
+
+폼 디자인이 다른 이유 : 
+Bootstrap 5는 table 기반 폼 미지원.
+Bootstrap 4까지는 form-horizontal 같은 테이블식 정렬을 썼지만, Bootstrap 5에서는 flex와 grid 기반으로 완전히 바뀜
+따라서 <table>{{ form }}</table>를 쓰면 CSS 리셋(특히 Bootstrap의 table 스타일)이 기본 폼 구조를 깨뜨림.
+→ 결과적으로 라벨과 입력칸이 들쭉날쭉하게 보여.
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary float-end">완료</button>
+</form>
+이 형태 추천.
+기존의 <table> {{ form }} </table> -> {{ form.as_p }} 로 변경.
+간격 문제가 조정됨. 그러나, 입력란 정렬은 안됨. 나중에 부트스트랩으로 편집하면 좋을 것.
+
+로그인 시에만 포스트 작성이 가능하게 하고, 자동으로 작성자 입력하기
+- 테스트 코드 작성 : test_create_post수정. 로그인 안한 기본상태에서는 status_code != 200. 에디로 로그인 후 200
+- views.py postcreate 수정 : LoginRequiredMixin(장고 제공 클래스) 추가해서 로그인했을때만 정상적으로 페이지 보임.
+    *PostCreate 클래스에 기존에 상속받던 CreateView 클래스와 함께 LoginRequiredMixin 클래스를 상속받게 하는 것.
+     이게 CBV의 방식.
+test - ok
+runserver로 로그인 시 접속 안되는 거 확인.
+
+http://127.0.0.1:8000/accounts/login/?next=/blog/create_post/
+로그인 창 구현해두면 그곳으로 이어지도록 하는 것.
+
+- 테스트 코드 수정 : 포스트 작성 및 submit 버튼 클릭까지 테스트.
+- 즉시 실행해보면 test-failed. 작성 시 로그인된 계정 eddi가 자동으로 '작성자'로 등록되지 않음.
+- views.py의 PostCreate 클래스 내에, form_valid 함수를 재정의
+    * form_valid : 사용자가 제출한 폼이 유효할 때(form.is_valid() == True)
+    * form_invalid : 사용자가 제출한 폼이 유효하지 않을 때(form.is_valid()==False)
+    * user.is_authenticated : request.user 객체의 속성. 이 유저가 로그인되었는가?. 로그인 여부를 True/False로 반환.
+** 수정 : 교재에서는 return super(PostCreate, self).form_valid(form) 를 사용하나, 파이썬 버전 3에서는 기본제공 리턴값처럼 return super().form_valid(form)를 사용할 것을 권고함. 저건 2의 방식. super(class, self)하는 것은 구문이 길고 중복 가능성이 있어 권장하지 않는다고 gpt가 말함
+두가지 각각 테스트해볼 것.
+return super(PostCreate, self).form_valid(form) : Test-ok
+return super().form_valid(form) : test-ok
+권장되고 간략한 후자로.
+
++ 리다이렉트 /blog/하는거는 주소 수정시 일일이 다 고쳐야 해서 권장하지 않고 return redirect('blog:post_list') 같이 URL 이름을 쓰거나 reverse()/reverse_lazy()를 사용하는 게 좋음 이라는데 너무 기본적이고 근본적인 페이지로 리다이렉트라서 그냥 둘 생각.

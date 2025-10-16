@@ -1,0 +1,16 @@
+{% extends 'blog/base_full_width.html' %} <!-- base.html을 확장해 이 html에 넣기. -->
+
+{% block head_title %}Create Post - Blog{% endblock %}
+
+
+
+
+{% block main_area %}
+
+    <h1>새 포스트 작성하기</h1>
+    <hr/>
+    <form method="post" enctype="multipart/form-data">{% csrf_token %} <!--csrf토큰 : 웹사이트를 csrf공격으로부터 보호하기 위한 장고 제공 기능. 폼 사용시 필수로 쓸 것.-->
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary float-end">완료</button>
+    </form>
+{% endblock %}
