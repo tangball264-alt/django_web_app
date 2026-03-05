@@ -1,5 +1,6 @@
 {% extends 'blog/base.html' %} <!-- base.html을 확장해 이 html에 넣기. -->
 {% block main_area %}
+    <!--이 내용은 post_list입니다.-->
     <!-- 포스트 작성 버튼-->
     {% if user.is_authenticated %}
         {% if user.is_superuser or user.is_staff %}

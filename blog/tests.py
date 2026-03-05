@@ -158,9 +158,19 @@ class TestView(TestCase):
         self.assertIn('AboutMe', navbar.text)
         self.assertIn('Landing', navbar.text)
         # 1.3 navbar의 버튼들이 정상적으로 링크를 연결하는가?
-        #logo_btn = navbar.find('a', string=lambda t: t and 'BLOG with Django' in t)
-        logo_btn = navbar.find('a', href='/')
+
+        #로고 부분
+        #로고의 <a>태그를 지정. 식별자 : class = navbar-brand
+        logo_btn = navbar.find('a', class_='navbar-brand')
+        #해당 객체에 지정된 아이콘이 포함된다.
+        icon = logo_btn.find('i', class_='fa-solid fa-code')
+        self.assertIsNotNone(icon)
+        #해당 객체에 지정된 텍스트("BLOG with Django"가 포함된다.
+        self.assertIn('BLOG with Django', logo_btn.get_text())
+        #해당 객체의 링크가 정상적으로 이어진다.
         self.assertEqual(logo_btn.attrs['href'], '/')
+
+        #blog, aboutme, landing 의 nav-link들이 존재하며, 그 링크가 정상 연결됨.
         blog_btn = navbar.find('a', text='Blog')
         self.assertEqual(blog_btn.attrs['href'], '/blog/')
         about_me_btn = navbar.find('a', text='AboutMe')

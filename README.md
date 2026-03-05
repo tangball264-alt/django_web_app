@@ -748,5 +748,5 @@ logo_btn = navbar.find('a', href='/') 로 처리하고 실행해도 ok.
 
 할 일 : logo_btn 문제 해결하기. 해결 과정에서 얻은 지식(lamda등) TIL 기록하기
 
-ㅎ
+logo_btn 수정.
 
