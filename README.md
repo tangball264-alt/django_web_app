@@ -572,3 +572,181 @@ return super().form_valid(form) : test-ok
 권장되고 간략한 후자로.
 
 + 리다이렉트 /blog/하는거는 주소 수정시 일일이 다 고쳐야 해서 권장하지 않고 return redirect('blog:post_list') 같이 URL 이름을 쓰거나 reverse()/reverse_lazy()를 사용하는 게 좋음 이라는데 너무 기본적이고 근본적인 페이지로 리다이렉트라서 그냥 둘 생각.
+
+다음 단계는
+스태프/최고관리자 권한 부여(그리고 해당 유저들만 글 작성 가능) -> 나는 글 삭제 권한에 대해 어떤 구조인지 체크해야 할 듯. 
+-> 이건 삭제 기능부터 만들어야 하긴 함.
+ddd
+
+
+25일차
+오랜만에 왔으니 진행도부터 체크하자.
+마지막 git commit 은 '로그인한 사용자에게만 포스트 작성 페이지 열어주기' 다.
+그런데 실행해서 검토해보니 태그 페이지에 태그 아이콘을 넣었는데 이게 깨져서 사각형애 X채워진 걸로 나옴. 
+이거 우선 수정하고, 그 다음 테스트 파일 검토 후 390페이지부터 수행하자.
+아이콘 적용해놓은게 단체로 깨짐.
+
+아이콘 깨짐 ai로 이유 찾아보니 걍 폰트어썸 free에서는 regular 안되고 solid로 해야 되는 경우가 있다고. 특히 폰트어썸에서 무료-유료 변환으로 인해 발생하는 문제.
+실제 수정하니까 그것만 정상 작동함.
+이유는 찾았고, bootstrap 아이콘으로 바꿔버릴까 고민중.
+여튼 태그 아이콘 문제 수정 완료
+bootstrap으로 바꾸는 건 나중에 프로젝트 내용 전부 진행하고 하던가 하기로.
+
+우선 390페이지 진행에 앞서 내가 아직 하지 않았고 교재에는 진행된 부분
+: navbar에 login 추가
+
+진행하기
+관리자 페이지에서 user를 추가할 때, 권한을 부여할 수 있게 하기
+-> 스태프만 포스트를 작성하능하게 만들기 위해, 우선 스태프를 구분.
+-> UserPassesTestMixin 사용
+우선 테스트 코드 수정해 임시유저에게 is_staff를 조정하기.
+Q : 왜 '유저 계정 만들기' -> '해당 유저의 is_staff를 True로 조정' -> '해당 유저 정보 .save()'의 3단계를 거치는지. 즉, 왜 save를 별도로 하는지 궁금해.
+그리고 테스트 코드 수정해서 create_post()가 스태프가 작성 페이지 들어가면 status code가 200이고 스태프 아닌 유저가 들어가면 아님(실패) 되는지 확인
+수정 마쳤고, 즉시 테스트해보면 당연하게도 실패. views.py에 위에서 언급한 userpassestestmixin추가해야.
+기존 로그인 시에만 가능으로 loginrequiremixin이 있었는데, 그 옆에 이것도 추가.
+그리고 기존 로그인 시인 postCreate클래스에 is_staff 및 superuser 확인하는 함수 만들기. -> 이게 만드는 게 아니라 기존에 test_func 있어서 수정하는 거였음. 원래 이게 무슨 기능인가? 원래도 '이거에 접근해도 되는 사용자인가?'를 확인하는 목적이다.
+ 그리고 같은 클래스의 form_valid에서도 조금 수정해서 '인증된'유저 여부와 함께 superuser, staff 확인.
+test-ok
+
+포스트 작성 버튼은 내일.
+
+26일차
+생각보다 늦게 재시작하네.
+일단 navbar 디자인을 조금 변경.
+주요 navbar 링크들을 좌측으로 옮기고, 우측에 login 버튼 추가. 동시에 사이트 아이콘으로 코드</> 이 모양을 사용하기로 함. 추가.
+* navbar 요소 위치 조정 방법 : ms-auto (우측정렬|권장). 좌측정렬은 ul에 정렬을 적지 않고 디폴트로 출력. 우측정렬은 ul에 이 ms-auto를 추가.
+
+그 다음으로 new post 버튼 만들기
+위치는 post_list.html 파일. 맨 위에(block 문 아래)
+'로그인된'(=user.is_authentucated)상태에서만, 또한 그 권한이 슈퍼유저 혹은 스태프일 때 'New Post'버튼이 보인다.
+제작 과정
+<a class="btn btn-info float-right" href="#" role="button">New Post</a>
+이렇게 기본 link button 쓰니 좌측, 그리고 아래 포스트 리스트에 너무 붙어버림. 분명 float right를 했는데 왼쪽에 붙음. 맞다. 이전에도 float-end로 바꾸었음.
+그러자 최신 포스트 리스트의 오른쪽에 가버림.
+base.html의 {% block header_text %} 파트를 예시와 같이 이 버튼 바로 아래 배치하여 위치 조정하기로. 옮기고 block은 삭제. 
+또한 해당 페이지가 'BLOG'텍스트 외에도 메인 타이틀 기능을 하고 있었기에 현재와 같이 두면 메인 타이틀이 잘려버리는 문제 발생. 따라서 해당 파트 및, 그걸 유지하기 위해 해둔 각종 비효율적 조치 전체 삭제. 간략화.
+추가적으로 버튼 위치가 너무 높아 상단에 여유 공간 두기. 아이콘 및 띄어쓰기는 교재 참고.
+**챗지피티에서 float-end로 레이아웃 잡는 것이 부적절하다고 주장. 이것이 부트스트랩 버전차로 인한 영향인지, 혹은 할루시네이션인지 정확히 알 수 없음. chatgpt는 flex 사용 권장**
+그리고 높이 조정을 위해 main-area 컨테이너에 mt-4 추가로 상단 공간 만들어둠.
+나중에 getbootstrap 문서에서 form 파트 확인해서 form 디자인 수정하기.
+오늘은 여기까지.
+
+27일차
+그동안 다른 자격증 공부하다가 오랜만에 복귀. 일단 현재 진행상황을 다시 보고, 진행하려던 단계 해야 함.
+python manage.py runserver : 정상적으로 서버 동작. 로그인 버튼 존재함. 로그인 페이지 연결 안됨. admin으로 진행하여 로그인 필요. kdy, mysuperuser. 로그인 상태에서도 login 버튼 사라지지 않음. 로그인 상태에서만 new post 버튼 나타나는 것 확인됨. 포스트 작성 폼 확인됨.
+
+만약 로그인 상태에서 폼으로 진입한 후 로그아웃을 하고 포스트 작성 완료를 누를 경우, 작성이 되는가?
+Using the URLconf defined in django_web_app.urls, Django tried these URL patterns, in this order:
+admin/
+blog/
+about_me/
+^media/(?P<path>.*)$
+The current path, accounts/login/, didn’t match any of these.
+이렇게 실패하네. 404 page not found
+
+스태프 권한 확인하기
+adduser : staff1, staffaccount
+adduser : common1, commonaccount
+스태프권한으로 작성 가능 확인.
+일반 권한으로는 아직 정상 로그인을 못해서 확인 불가.
+대신 test쪽으로 확인해야 함.
+test 결과 : failed. 
+사유 : navbar 수정 중 <a>태그 안에 <i>태그 후 'BLOG with Django'텍스트가 들어가서.
+기존의 정답에서는 <a>'BLOG with Django'</a>였기에 logo_btn = navbar.find('a', text='BLOG with Django') 가 정상적으로 찾을 수 있었는데, 이게 <a><i></i>'BLOG with Django'</a>가 되면서 탐색이 실패(NoneType 반환)하는 것.
+즉, 디자인 변경이 들어가며 기존의 navbar 코드와 달라졌고, 따라서 테스트 코드에 변환이 필요.
+하여 
+#logo_btn = navbar.find('a', text='  BLOG with Django')
+대신
+logo_btn = navbar.find('a', text=lambda t: t and 'BLOG with Django' in t)
+사용.
+오늘의 TIL : lambda t: t and 'BLOG with Django' in t 로 사용한 '람다 함수'
+
+
+test-ok : python manage.py test blog.tests.TestView.test_create_post 로 분리해서 보면 성공.
+test-failed : % python manage.py test                                     
+Found 5 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+E.EEE
+======================================================================
+ERROR: test_category_page (blog.tests.TestView.test_category_page)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 175, in test_category_page
+    self.navbar_test(soup)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 162, in navbar_test
+    self.assertEqual(logo_btn.attrs['href'], '/')
+                     ^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'attrs'
+
+======================================================================
+ERROR: test_post_detail (blog.tests.TestView.test_post_detail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 132, in test_post_detail
+    self.navbar_test(soup)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 162, in navbar_test
+    self.assertEqual(logo_btn.attrs['href'], '/')
+                     ^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'attrs'
+
+======================================================================
+ERROR: test_post_list (blog.tests.TestView.test_post_list)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 66, in test_post_list
+    self.navbar_test(soup)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 162, in navbar_test
+    self.assertEqual(logo_btn.attrs['href'], '/')
+                     ^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'attrs'
+
+======================================================================
+ERROR: test_tag_page (blog.tests.TestView.test_tag_page)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 193, in test_tag_page
+    self.navbar_test(soup)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 162, in navbar_test
+    self.assertEqual(logo_btn.attrs['href'], '/')
+                     ^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'attrs'
+
+----------------------------------------------------------------------
+Ran 5 tests in 4.893s
+
+FAILED (errors=4)
+Destroying test database for alias 'default'...
+전체 실행 시 실패. 
+
+현재 실패한 테스트코드는
+1. 카테고리 페이지(프로그래밍 카테고리)
+2. 포스트 상세 페이지('/blog/1/')
+3. 포스트 목록 페이지('/blog/')
+4. 태그 페이지(헬로 태그)
+
+테스트코드의 구성은 다음과 같다.
+tests.py
+  └─ TestView (TestCase 클래스)
+     ├─ setUp()
+     ├─ category_widget_test()
+     ├─ navbar_test()
+     │
+     ├─ test_post_list()
+     ├─ test_post_detail()
+     ├─ test_category_page()
+     ├─ test_tag_page()
+     └─ test_create_post()
+그 중,  카테고리 위젯 테스트와 내비게이션 바 테스트는 보조 함수로 다른 테스트에서 호출됨.
+나머지 5개의 테스트 중, navbar_test를 호출하지 않는 test_create_post를 제외하고 나머지 넷 모두 같은 구간에서 오류 발생. 나중에 전체 수정해야 함.
+현재 임의로 logo_btn 관련 파트 일괄 주석 처리하자 ok
+logo_btn = navbar.find('a', href='/') 로 처리하고 실행해도 ok.
+
+할 일 : logo_btn 문제 해결하기. 해결 과정에서 얻은 지식(lamda등) TIL 기록하기
+
+ㅎ
+

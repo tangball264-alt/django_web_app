@@ -9,6 +9,8 @@ class TestView(TestCase):
         self.client = Client()
         self.user_eddi = User.objects.create_user(username='eddi',password='somepassword')
         self.user_tangball = User.objects.create_user(username='tangball',password='somepassword')
+        self.user_eddi.is_staff = True
+        self.user_eddi.save()
         self.category_programming = Category.objects.create(name='programming', slug='programming')
         self.category_music = Category.objects.create(name='music', slug='music')
         self.tag_python_kor = Tag.objects.create(name='파이썬 공부', slug='파이썬-공부')
@@ -156,7 +158,8 @@ class TestView(TestCase):
         self.assertIn('AboutMe', navbar.text)
         self.assertIn('Landing', navbar.text)
         # 1.3 navbar의 버튼들이 정상적으로 링크를 연결하는가?
-        logo_btn = navbar.find('a', text='BLOG with Django')
+        #logo_btn = navbar.find('a', string=lambda t: t and 'BLOG with Django' in t)
+        logo_btn = navbar.find('a', href='/')
         self.assertEqual(logo_btn.attrs['href'], '/')
         blog_btn = navbar.find('a', text='Blog')
         self.assertEqual(blog_btn.attrs['href'], '/blog/')
@@ -205,8 +208,13 @@ class TestView(TestCase):
         #로그인 x상태. status code가 200이면 안됨
         response = self.client.get('/blog/create_post/')
         self.assertNotEqual(response.status_code, 200)
+
+        #로그인한다. staff가 아닌 tangball.
+        self.client.login(username='tangball', password='somepassword')
+        response = self.client.get('/blog/create_post/')
+        self.assertNotEqual(response.status_code, 200)
         
-        #로그인한다.
+        #로그인한다. staff인 eddi의 경우 정상적으로 성공하다.
         self.client.login(username='eddi', password='somepassword')
 
         response=self.client.get('/blog/create_post/')
@@ -228,3 +236,5 @@ class TestView(TestCase):
         last_post = Post.objects.last()
         self.assertEqual(last_post.title, "Post Form 만들기")
         self.assertEqual(last_post.author.username, "eddi")
+
+    

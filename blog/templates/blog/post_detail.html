@@ -27,7 +27,7 @@ Blog Post - {{post.title}}
             <div class="text-muted fst-italic mb-2">작성일자 : {{post.created_at}} | 최근 수정일자 : {{post.changed_at}}</div>
             <!-- Post Tags -->
             {% if post.tags.exists %}
-                <i class="fa-regular fa-tags"></i>
+                <i class="fa-solid fa-tags"></i>
                 {% for tag in post.tags.iterator %}
                     <a href="{{ tag.get_absolute_url }}"><span class="badge text-bg-secondary">{{tag}}</span></a>
                 {% endfor %}

@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Category, Tag
 
 
@@ -24,13 +24,16 @@ class PostDetail(DetailView):
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
         return context
     
-class PostCreate(LoginRequiredMixin,CreateView):
+class PostCreate(LoginRequiredMixin, UserPassesTestMixin ,CreateView):
     model = Post
     fields = ['title', 'content', 'head_image', 'attachment', 'category']
 
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.is_superuser
+
     def form_valid(self, form):
         current_user = self.request.user
-        if current_user.is_authenticated:
+        if current_user.is_authenticated and (self.request.user.is_staff or self.request.user.is_superuser): #이 유저가 인증되었으며, 스태프거나 수퍼유저일 것.
             form.instance.author = current_user
             return super().form_valid(form)
         else : 

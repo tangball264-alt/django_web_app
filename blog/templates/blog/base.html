@@ -20,33 +20,10 @@
         <!-- Responsive navbar-->
          {% include 'blog/navbar.html' %}
         
-        <!-- Page header with logo and tagline-->
-        {% block header_text %}
-        {% if category %}
-        <div class="container my-5">
-            <h1>Blog <span class="badge rounded-pill text-bg-info">{{ category }}</span></h1>
-        </div>
-        {% elif tag %}
-        <div class="container my-5">
-            
-            <h1>Blog <i class="fa-regular fa-tags"></i> <span class="badge text-bg-secondary">{{ tag }}</span></h1>
-        </div>
-        {% else %}
-        <header class="py-5 bg-light border-bottom mb-4">
-            <div class="container">
-                <div class="text-center my-5">
-                    
-                    <h1 class="fw-bolder">Welcome to Blog Home!</h1>
-                    <p class="lead mb-0">A Bootstrap 5 starter layout for your next blog homepage</p>
-                </div>
-            </div>
-        </header>
-        {% endif %}
-        {% endblock %}
         <!-- Page content-->
         <div class="container">
             <div class="row">
-                <div class="col-lg-8" id="main-area">
+                <div class="col-lg-8 mt-4" id="main-area">
                     {% block main_area %}
                     {% endblock %}
                 </div>

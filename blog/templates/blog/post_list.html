@@ -1,7 +1,22 @@
 {% extends 'blog/base.html' %} <!-- base.html을 확장해 이 html에 넣기. -->
 {% block main_area %}
-    <!-- Blog entries-->
+    <!-- 포스트 작성 버튼-->
+    {% if user.is_authenticated %}
+        {% if user.is_superuser or user.is_staff %}
+            <a class="btn btn-info btn-sm float-end" href="/blog/create_post/" role="button"><i class="fa-solid fa-pen"></i>New Post</a>
+        {% endif %}
+    {% endif %}
 
+
+    <!-- 포스트 헤더 -->
+    <h1>Blog
+    {% if category %}
+    <span class="badge rounded-pill text-bg-info">{{ category }}</span>
+    {% elif tag %}
+    <i class="fa-solid fa-tags"></i> <span class="badge text-bg-secondary">{{ tag }}</span>
+    {% endif %}
+    </h1>
+    
     <!-- Featured blog post-->
     <!-- 포스트 리스트 -->
     {% if post_list %}
@@ -22,7 +37,7 @@
             <p class="card-text">{{ post_list.0.content }}</p>
             
             {% if post_list.0.tags.exists %}
-                <i class="fa-regular fa-tags"></i>
+                <i class="fa-solid fa-tags"></i>
                 {% for tag in post_list.0.tags.iterator %}
                     <a href="{{ tag.get_absolute_url }}"><span class="badge text-bg-secondary">{{tag}}</span></a>
                 {% endfor %}
