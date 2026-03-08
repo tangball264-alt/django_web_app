@@ -247,4 +247,43 @@ class TestView(TestCase):
         self.assertEqual(last_post.title, "Post Form 만들기")
         self.assertEqual(last_post.author.username, "eddi")
 
-    
+    def test_update_post(self):
+        #특정 포스트의 수정 페이지로 들어가기
+        update_post_url = f'/blog/update_post/{self.post_003.pk}/'
+
+        #로그인 안한 싱태 : 실패
+        response = self.client.get(update_post_url)
+        self.assertNotEqual(response.status_code, 200)
+
+        #작성자가 아닌 계정으로 로그인한 상태 : 실패
+        self.assertNotEqual(self.post_003.author, self.user_tangball)
+        self.client.login(username='tangball', password='somepassword')
+        response = self.client.get(update_post_url)
+        self.assertEqual(response.status_code, 403) #403 코드의 의미는?
+
+        #작성자로 로그인한 상태 : 성공
+        self.client.login(username='eddi', password='somepassword')
+        response = self.client.get(update_post_url)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        #포스트를 수정한다.
+        self.assertEqual('Edit Post - Blog', soup.title.text) #현재 창의 탭 이름이 다음과 같다.
+        main_area = soup.find('div',id='main-area')
+        self.assertIn('포스트 수정하기', main_area.text)
+        response = self.client.post(
+            update_post_url,
+            {
+                'title' : '세 번째 포스트 수정됨',
+                'content' : 'hello world! we are the one!',
+                'category' : self.category_music.pk
+            },
+            follow=True
+        )
+        #수정된 포스트가 잘 반영되었는지 확인. 
+        soup = BeautifulSoup(response.content, 'html.parser')
+        main_area = soup.find('div',id='main-area')
+        self.assertIn('세 번째 포스트 수정됨', main_area.text)
+        self.assertIn('hello world! we are the one!', main_area.text)
+        self.assertIn(self.category_music.name, main_area.text)
+

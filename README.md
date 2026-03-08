@@ -750,3 +750,36 @@ logo_btn = navbar.find('a', href='/') 로 처리하고 실행해도 ok.
 
 logo_btn 수정.
 
+28일차
+포스트 수정 페이지를 만들자.
+1. 테스트 코드 작성하기(이 단계에서 이 페이지의 기본 요건을 정의한다.)
+2. urls.py와 views.py를 수정한다.
+- view 만들 때, 권한과 CBV 사용에 주의.
+3. 필요한 html을 작성한다.
+
+29일차
+테스트 코드 작성 완료 확인
+urls.py : post의 pk값으로 url 구분. CBV 방식으로 사용
+views.py : Django.views.generic 에서 UpdateView를 추가로 import. 내용은 기본적으로 포스트 작성을 위한 클래스와 유사하게.
+class PostUpdate(LoginRequiredMixin, UpdateView):
+    model = Post
+    fields = ['title', 'content', 'head_image', 'attachment', 'category', 'tags']
+테스트 결과 : 작성자 외 유저로 수정 시도 시 status code가 404->200으로 변경.
+
+즉, 현재로서는 작성자 식별 기능이 부재하다.
+
+CBV에서 제공되는 dispatch 메서드를 이용하여 요청 방식을 판단할 수 있다.
+요청 방식
+- GET 방식 : 방문자가 서버에 들어옴. 이제 서버는 방문자에게 폼 페이지를 보내줘야.(CreateView나 UpdateView에서)
+- POST 방식 : 방문자가 작성한 폼을 서버에게 보냄. 이제 서버는 그 폼이 유효한지 확인하고, 유효하다면 DB에 저장.
+*이거 오늘 TIL로 하자.
+디스패치 메서드에서, 요청이 유효한 유저에 의해 발생했다면 마저 수행한다.
+그렇지 않다면 PermissionDenied로 403 오류메시지를 보낸다.
+
+다음 할 일
+포스트 상세 페이지에 포스트 수정 버튼 넣기 : 포스트 리스트 페이지의 new post 버튼 가져다가 권한이랑 링크, 텍스트 수정해서 post_detail 페이지 수정.
+포스트 수정 페이지 제목을 Create Post - Blog 에서 Edit Post - Blog로 수정하기. : 기존 post_form 공유 대신 post_update_form.html 작성하기.
+
+
+
+

@@ -6,6 +6,10 @@ Blog Post - {{post.title}}
 
 {% block main_area %}
     <!--이 내용은 post_detail입니다.-->
+    <!-- 포스트 수정 버튼-->
+    {% if user.is_authenticated and user == post.author %}
+        <a class="btn btn-info btn-sm float-end" href="/blog/update_post/{{post.pk}}" role="button"><i class="fa-solid fa-pen"></i>Edit Post</a>    
+    {% endif %}
     <!-- Post content-->
     <article id="post-area">
         <!--이 포스트의 카테고리-->

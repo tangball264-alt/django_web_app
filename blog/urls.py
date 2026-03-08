@@ -10,4 +10,12 @@ urlpatterns = [
     path('category/<str:slug>/', views.category_page),
     path('tag/<str:slug>/', views.tag_page),
     path('create_post/', views.PostCreate.as_view()),
+    path('update_post/<int:pk>/', views.PostUpdate.as_view())
 ]
+#현재 존재하는 페이지
+#포스트 목록
+#포스트 상세
+#카테고리 검색
+#태그 검색
+#포스트 작성
+#포스트 수정
