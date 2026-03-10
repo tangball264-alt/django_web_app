@@ -231,21 +231,34 @@ class TestView(TestCase):
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
 
+        #작성 페이지는 정상적으로 구성되어 있다.
         self.assertEqual('Create Post - Blog', soup.title.text)
         main_area = soup.find('div', id='main-area')
         self.assertIn('새 포스트 작성하기', main_area.text)
+
+        #태그 입력란 확인. assertTrue가 assertIn과 뭐가 다르지? 혹은 assertEqual과는? 입력 요소가 하나인 것 외에는? 용도는?
+        tag_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tag_str_input)
 
         self.client.post(
             '/blog/create_post/',
             {
                 'title' : 'Post Form 만들기',
                 'content' : "Post Form 페이지를 만듭시다.",
+                'tags_str' : 'new tag; 한글 태그, python'
             }
         )
+
+        #내용 정상 입력 확인
         self.assertEqual(Post.objects.count(),4)
         last_post = Post.objects.last()
         self.assertEqual(last_post.title, "Post Form 만들기")
         self.assertEqual(last_post.author.username, "eddi")
+        #태그 정상 입력 확인
+        self.assertEqual(last_post.tags.count(),3)
+        self.assertTrue(Tag.objects.get(name='new tag'))
+        self.assertTrue(Tag.objects.get(name='한글 태그'))
+        self.assertEqual(Tag.objects.count(),5) #기존 태그 3개, 이번에 입력하여 작성된 중복(python)제외 2개.
 
     def test_update_post(self):
         #특정 포스트의 수정 페이지로 들어가기

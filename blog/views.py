@@ -3,6 +3,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Category, Tag
 from django.core.exceptions import PermissionDenied
+from django.utils.text import slugify
+
 
 # Create your views here.
 class PostList(ListView):
@@ -35,13 +37,30 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin ,CreateView):
         current_user = self.request.user
         if current_user.is_authenticated and (self.request.user.is_staff or self.request.user.is_superuser): #이 유저가 인증되었으며, 스태프거나 수퍼유저일 것.
             form.instance.author = current_user
-            return super().form_valid(form)
+            response = super(PostCreate, self).form_valid(form)
+
+            tags_str = self.request.POST.get('tags_str')
+            if tags_str:
+                tags_str = tags_str.strip()#문자열의 공백 등을 제거하여 반환
+
+                tags_str = tags_str.replace(',',';') #쉼표를 세미콜론으로 변환한 문자열을 반환. 
+                tags_list = tags_str.split(';')#지정 문자를 기준으로 그 전후를 분할해 반환. 지정 문자는 버린다.
+
+                for t in tags_list:
+                    t = t.strip()
+                    tag, is_tag_created = Tag.objects.get_or_create(name=t) #태그(t)를 tag 변수에. 또한 기존Tag.objects에 없어 create해야 한다면 is_tag_created=True
+                    if is_tag_created:
+                        tag.slug = slugify(t, allow_unicode=True)
+                        tag.save() #기존에 없다면 slug를 만들고 저장.
+                    self.object.tags.add(tag)#이 포스트에 태그 추가.
+
+            return response
         else : 
             return redirect('/blog/')
 
 class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Post
-    fields = ['title', 'content', 'head_image', 'attachment', 'category', 'tags']
+    fields = ['title', 'content', 'head_image', 'attachment', 'category']
 
     template_name = 'blog/post_update_form.html'
 
