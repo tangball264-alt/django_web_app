@@ -840,4 +840,53 @@ as_p대신 as_table로 하면 교재와 동일한 방식으로 작성할 수 있
 입력란 추가 및 삭제는 완료
 이제 입력 기능을 넣어야 함.
 1. 입력 기능을 넣은 후에 사용할 테스트 코드 만들기
-2. 입력 기능을 넣기.
+2. 입력 기능을 넣기. : views.py의 form_valid 수정.
+3. 테스트 및 runserver로 기능 시험해보기
+4. 모두 통과 되었으므로, 저장.
+
+
+30일차
+포스트 수정 페이지를 위한 태그 기능 구현하기
+
+포스트 수정 페이지는 '기존에 입력된 태그'를 확인하고, 수정할 수 있어야 한다.
+또한 새로이 입력되는 태그를 추가하여야 한다.
+
+1. 테스트 코드 작성하기
+- test_update_post를 수정함.
+- 시범 테스트
+-   File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 291, in test_update_post
+    self.assertIn('파이썬 공부; python', tag_str_input.attrs['value'])
+                                         ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+    KeyError: 'value'
+- 수정 페이지 들어가면, 원래 태그들이 Tags의 입력창에 미리 적혀있어야 함. 그 기존값들이 'value'값.
+2. 코드 수정해 기능 넣기
+- html파일에 태그 창 넣기는 이미 완료. value속성을 추가하고 default하기.
+- views.py 수정하기. : get_context_data, form_valid 작성.
+3. 테스트 : faild
+- 왜? 어째서 edit 들어가면 기존 태그를 출력하는 기능이 작동하지 않는 것일까?
+
+31일차
+오류 원인 찾음.
+사유 : views.py의 PostUpdate클래스 내 get_context_data 작성 중 오타 발생.
+context['tag_str_default'] = '; '.join(tags_str_list)
+tags_str_default가 맞다. s하나 빼먹어서 오류......
+수정 후 test 진행하자 오류 발생
+
+traceback (most recent call last):
+  File "/Users/godayeong/Documents/GitHub/django_web_app/blog/tests.py", line 310, in test_update_post
+    self.assertIn('파이썬 공부', main_area.text)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '파이썬 공부' not found in (이하생략)
+
+----------------------------------------------------------------------
+Ran 6 tests in 6.545s
+
+FAILED (failures=1)
+그러나 runserver로 시험해보니 정상 작동.
+
+오류가 tests.py에 있었음.
+test_update_post에서 변수 tag_str_input = main_area.find('input', id='id_tags_str')와 
+그 내부 포스트의 요소인 'tags_str' : '파이썬 공부; 한글 태그, some tag'을 혼동하여 후자도 tag_str로 작성.
+이로 인하여 오류 발생.
+
+test-OK

@@ -64,6 +64,16 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
 
     template_name = 'blog/post_update_form.html'
 
+    def get_context_data(self, **kwargs):
+        context =  super(PostUpdate, self).get_context_data()
+        if self.object.tags.exists(): #이 포스트에 태그가 존재한다면
+            tags_str_list = list() #우선 빈 리스트를 만들고
+            for t in self.object.tags.all(): #그 리스트에 이 포스트의 모든 태그를 넣는다.
+                tags_str_list.append(t.name)
+            context['tags_str_default'] = '; '.join(tags_str_list) #리스트의 내용들을 '; '을 끼고 이어붙인다. 이걸 반환할 정보에 포함.
+
+        return context
+
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and request.user == self.get_object().author:
             #요청자가 인증(로그인)됨+요청자가 지금 오브젝트(포스트)의 작성자와 동일인이면
@@ -71,6 +81,29 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
             #포스트업데이트 가능.
         else:
             raise PermissionDenied #아니면 '권한이 없음' 판정 = 403 오류 메시지.
+        
+    def form_valid(self, form):
+        #권한 확인은 dispatch에서 맡는다. author는 이미 채워졌다.
+        response = super(PostUpdate, self).form_valid(form)
+        self.object.tags.clear() #기존 tag를 모두 지우고 새로이 쓴다.
+    
+        tags_str = self.request.POST.get('tags_str')
+        if tags_str:
+            tags_str = tags_str.strip()
+
+            tags_str = tags_str.replace(',',';') 
+            tags_list = tags_str.split(';')
+
+            for t in tags_list:
+                t = t.strip()
+                tag, is_tag_created = Tag.objects.get_or_create(name=t)
+                if is_tag_created:
+                    tag.slug = slugify(t, allow_unicode=True)
+                    tag.save()
+                self.object.tags.add(tag)
+
+        return response
+
         
 
 

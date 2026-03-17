@@ -280,16 +280,24 @@ class TestView(TestCase):
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        #포스트를 수정한다.
-        self.assertEqual('Edit Post - Blog', soup.title.text) #현재 창의 탭 이름이 다음과 같다.
+        #수정 창의 요소들이 정상적으로 존재한다.
+        self.assertEqual('Edit Post - Blog', soup.title.text) 
         main_area = soup.find('div',id='main-area')
         self.assertIn('포스트 수정하기', main_area.text)
+
+        #태그 부분도 정상적으로 나타난다.
+        tag_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tag_str_input)
+        self.assertIn('파이썬 공부; python', tag_str_input.attrs['value'])
+
+        #포스트를 수정한다.
         response = self.client.post(
             update_post_url,
             {
                 'title' : '세 번째 포스트 수정됨',
                 'content' : 'hello world! we are the one!',
-                'category' : self.category_music.pk
+                'category' : self.category_music.pk,
+                'tags_str' : '파이썬 공부; 한글 태그, some tag'
             },
             follow=True
         )
@@ -299,4 +307,9 @@ class TestView(TestCase):
         self.assertIn('세 번째 포스트 수정됨', main_area.text)
         self.assertIn('hello world! we are the one!', main_area.text)
         self.assertIn(self.category_music.name, main_area.text)
+        self.assertIn('파이썬 공부', main_area.text)
+        self.assertIn('한글 태그', main_area.text)
+        self.assertIn('some tag', main_area.text)
+        self.assertNotIn('python', main_area.text)
+        
 
