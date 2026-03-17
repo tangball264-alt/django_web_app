@@ -38,9 +38,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django_extensions',
+
+    'crispy_forms',
+    'crispy_bootstrap5',
+
     'blog',
     'single_pages',
-    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +131,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_URL = '/media/' #도메인 뒤에 이 경로가 붙으면 미디어 파일을 쓴다.
 MEDIA_ROOT = os.path.join(BASE_DIR, '_media') #베이스 디렉토리(=프로젝트 폴더) 아래 _media 라는 폴더를 만들고 여기에 이미지 파일을 저장
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = 'bootstrap5'

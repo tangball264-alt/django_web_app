@@ -890,3 +890,21 @@ test_update_post에서 변수 tag_str_input = main_area.find('input', id='id_tag
 이로 인하여 오류 발생.
 
 test-OK
+
+다음 단계
+입력 폼 꾸미기
+django-crispy-form 사용 예정. pip install 시행. settings.py INSTALLED_APPS에 등록. *이 때, 템플릿 팩 지정에 교재와 달리 bootstrap5사용.
+post_form.html 수정해서 적용.
+
+오류 발생.
+부트스트랩 버전 4->5 넘어오고 crispy도 버전 2.0으로 넘어오면서 install부터 settings 적용까지 변화가 상당히 있었고, 따라서 나도 수정해야 함.
+AI 내용을 바로 따라도 되는지 확인을 위해 crispy 문서 확인
+https://newreleases.io/project/pypi/django-crispy-forms/release/2.0a1?utm_source=chatgpt.com
+부트스트랩 2, 3, 4는 템플릿 제거 및 별도 패키지로 이동
+부트스트랩5는 아예 외부 패키지(crispy-bootstrap5)로 제공
+따라서 pip install crispy-bootstrap5 실행 후 CRISPY_TEMPLATE_PACK외에도 CRISPY_ALLOWED_TEMPLATE_PACK을 지정해서 보안 체크를 해야
+참고 : https://github.com/django-crispy-forms/crispy-bootstrap5 내 README.md 의 Useage 파트.
+
+페이지 전체로 바뀜. 작성완료 버튼 간격 추가 위해 중간에 <br/> 코드 삽입
+그 외 main-area요소 전체가 상단 navbar와 하단 footer에 지나치게 붙음. 전체 div로 감싸고 마진 부여.
+업데이트 폼도 마찬가지로 수정.
