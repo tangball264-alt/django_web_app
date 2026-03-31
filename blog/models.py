@@ -1,6 +1,11 @@
 import os
 from django.db import models
 from django.contrib.auth.models import User
+from markdownx.models import MarkdownxField
+#from markdownx.utils import markdown # 이 부분 수정하기로 함.
+from markdownx.utils import markdownify
+import bleach
+import html
 
 # Create your models here.
 class Category(models.Model):
@@ -33,7 +38,7 @@ class Tag(models.Model):
 
 class Post(models.Model):#데이터베이스 테이블로 이 데이터들을 관리하겠다 -> models.Model
     title = models.CharField(max_length = 50)
-    content = models.TextField()
+    content = MarkdownxField()
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True) #유저 삭제 시 포스트의 '작성자'값을 null로 변경.
 #    author = models.ForeignKey(User, on_delete=models.CASCADE) #'유저 삭제 시 포스트 함께 삭제.'
     created_at = models.DateTimeField(auto_now_add=True) #필드가 생성될 때 한번만 현재시간 작성.
@@ -58,5 +63,31 @@ class Post(models.Model):#데이터베이스 테이블로 이 데이터들을 �
     def get_file_ext(self):
         return self.get_file_name().split('.')[-1]
     
+    def get_content_markdown(self):
+        # 1. HTML 태그를 문자로 변환 (핵심)
+        escaped_content = html.escape(self.content)
 
+        # 2. Markdown 적용
+        html_content = markdownify(escaped_content)
+
+        # 3. 필요한 HTML만 허용
+        allowed_tags = [
+            'p', 'br',
+            'strong', 'em',
+            'h1', 'h2', 'h3',
+            'ul', 'ol', 'li',
+            'blockquote',
+            'code', 'pre',
+            'del',                       # 취소선
+            'table', 'thead', 'tbody',   # 테이블
+            'tr', 'th', 'td'
+        ]
+
+        cleaned = bleach.clean(
+            html_content,
+            tags=allowed_tags,
+            strip=True
+        )
+
+        return cleaned
         

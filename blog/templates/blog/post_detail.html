@@ -29,6 +29,7 @@ Blog Post - {{post.title}}
             </p>
             <!-- Post meta content-->
             <div class="text-muted fst-italic mb-2">작성일자 : {{post.created_at}} | 최근 수정일자 : {{post.changed_at}}</div>
+            
             <!-- Post Tags -->
             {% if post.tags.exists %}
                 <i class="fa-solid fa-tags"></i>
@@ -44,7 +45,7 @@ Blog Post - {{post.title}}
         <figure class="mb-4"><img class="img-fluid rounded" src="{{post.head_image.url}}" alt="{{post.title}} head image" /></figure>
         {% endif %}
         <!-- Post content-->
-        <p>{{post.content}}</p>
+        <p>{{post.get_content_markdown | safe}}</p>
         <!-- 첨부파일 다운로드 버튼 -->
         {% if post.attachment %}
         <a href="{{post.attachment.url}}" download class="btn btn-outline-primary" role="button">다운로드 : {{post.get_file_name}} </a>

@@ -908,3 +908,184 @@ https://newreleases.io/project/pypi/django-crispy-forms/release/2.0a1?utm_source
 페이지 전체로 바뀜. 작성완료 버튼 간격 추가 위해 중간에 <br/> 코드 삽입
 그 외 main-area요소 전체가 상단 navbar와 하단 footer에 지나치게 붙음. 전체 div로 감싸고 마진 부여.
 업데이트 폼도 마찬가지로 수정.
+
+32일차
+
+마크다운 적용하기
+
+django-markdownx를 설치하여 포스트에 마크다운 문법을 적용하면 포스트에서 줄바꿈이 되지 않는 문제를 해결할 수 있다.
+우선 공식 웹사이트를 보며 업데이트 상황과 변화를 확인하기.
+(http://neutronx.github.io/django-markdownx/)
+
+
+*Python Package Index(PyPI) : 파이썬 패키지를 업로드하고 배포하는 공식 저장소.*
+공식 문서에 github이랑 나오길래 뭔지 검색해봄.
+
+문서 권고와 교재의 단계가 다르다.
+교재에서는 없는 단계인
+and, don't forget to collect MarkdownX assets to your STATIC_ROOT. To do this, run:
+```
+python3 manage.py collectstatic
+```
+이 존재함. 이 차이가 AI한테 물어보니 프로젝트에 있는 모든 정적 파일(static files)을 한 곳(STATIC_ROOT)으로 모으는 명령어인데, 교재는 개발환경(runserver)를 쓰니까 불필요했던 것으로 추정된다고.
+내 settings.py에는 static_root는 없는데, 작성하면 생기나?
+
+즉, 배포 직전에 하면 충분함. 나는 이건 생략하고 최종 단계에서 사용을 고민할 것.
+
+**배포 고려한다면 나중에 이 명령어 하기.**
+
+blog/models.py 수정하기
+포스트 모델의 콘텐츠를 textfield 대신 markdownxfield로 바꾸기. 이렇게 되면 포스트의 본문이 마크다운이 됨.
+오랜만이라 당황스럽긴 한데 모델 수정하면 migration 필수
+form 문서에 {{form.media }}추가
+
+위치가 
+    </form>
+    {{ form.media }}
+위치가 예상 밖이긴 한데 교재와 문서 모두 동일하게 요구
+
+교재를 보고 패키지를 적용하는 것도 좋지만, 실무를 고려하면 이번처럼 각 패키지의 공식 페이지를 보며 사용법을 따라가는 것이 더 좋을듯 하다.
+
+이 컨텐츠 값을 html로 반환하는 작업이 필요함.
+이게 왜 필요한지랑 문서에 없는데 어떻게 사용해야하는지가 의문이네.
+
+
+33일차
+마크다운 적용 이어서.
+
+지난 작업 : 
+- blog/models.py를 수정
+- Post모델에 get_content_markdown 메서드를 추가한다.
+- 이 메서드는 content 필드의 내용물(텍스트)을 마크다운 문법을 적용해 html로 만든다.
+
+이번 작업 : 
+- post_detail.html을 수정
+- 기존 <p>{{ post.content }}</p>를 바꾼다.
+- <p>{{ post.get_content_markdown }}</p>
+- html이스케이핑 방지용 필터 추가 (" | safe")
+
+이상으로 포스트 상세페이지 마크다운 출력 성공
+
+- post_list.html 수정
+- 기존 <p class="card-text">{{ post_list.0.content }}</p> 와 <p class="card-text">{{ p.content | truncatewords:15}}</p> 수정.
+- <p class="card-text">{{ p.content | truncatewords:50}}도.
+- 후자는 {{ p.get_content_markdown | truncatewords_html : 숫자 | safe }}로
+- 전자는 {{ p.get_content_markdown | safe }}로.
+- 그 후, 교재 원문과 내 아이디어로 달라진 디자인에 적합한지 재확인.
+- 각각 최신포스트, 헤드이미지 없는 일반포스트, 헤드이미지 있는 일반포스트.
+
+결과 : 출력 시 일부에 무의미한 <p>태그 장착됨.
+태그 입력 기능의 폼 코드를 문장 내에 작성했는데 실제 출력에서 코드가 아닌 태그 형태로 출력되는 현상.
+
+{{ p.content | truncatewords:50}} 수정하며 safe 안 붙인 것 확인. 이를 수정함. : <p> 태그 등 사라짐.
+
+실제 태그 입력폼이 출력되는 문제는?
+
+
+
+
+현재 문제 분석
+1. 포스트 내에 html 코드가 일부 삽입되었는데, 해당 코드가 해석되어 작동
+2. &lt;등 html 엔티티가 삽입되었을 때, ``` 로 코드블럭을 생성하면 <등 기호 대신 &lt의 원문으로 출력된다. 하지만, 위의 html 코드에는 코드블럭이 안된다.
+3. AI 에 현재 상황을 물어본 결과, 현재 구조 자체가 코드와 텍스트 혼합에 취약하다고. markdownx필터를 더 권장한다고 함.
+
+문서가 잘 안읽혀.
+우선 markdownx 필터를 테스트로 사용해보고, 문서에서 구체적인 정보를 추가로 찾자. 
+
+34일차
+markdownx필터 사용하자니 load하기 번거롭고 정상 작동 안함.
+markdown 함수 대신 markdownify함수 사용하는 방식 선택.
+
+포스트 리스트에서 일부 카드와 footer등이 다른 카드 안에 속하게 되는 문제 발생.
+> 원인 : 포스트 내에 작성된 <tr>등으로 대표되는 일부 html 코드.
+포스트를 수정하여 내용을 삭제하자 복구됨.
+
+하지만 이런 문제를 방조할 수 없음. 결국 '포스트에 실제 html 태그를 작성하면 안됨.'을 요구할 게 아니라면 고쳐야 해.
+어떻게 해야 하지?
+
+AI 권장 : bleach 사용해서 마크다운에서 html을 일부 혹은 전부 차단하기.
+
+
+35일차
+bleach install
+def get_content_markdown(self):
+    html = markdownify(self.content)
+    return bleach.clean(html, tags=[], strip=True)
+
+
+결과 : html은 제거되고 텍스트만 남는다. 줄바꿈 함께 제거됨.
+return bleach.clean(html, tags=[], strip=True).replace('\n', '<br>')
+이걸로 엔터만 남겨두면?
+결과 : 줄바꿈 정상 남음.
+
+문제 : 우선 html을 없애는 게 아니라 문자열 형태로 이스케이프하고 싶음.
+      그리고 줄바꿈은 유지하고
+      마크다운 문법인 #이나 *만 남기기.
+이해도 부족해서 일단 AI 내용 그대로 사용. 이제부터 분석해야 함.
+```
+import bleach
+import html
+from markdownx.utils import markdownify
+
+def get_content_markdown(self):
+    # 1. html 태그들을 텍스트로 변환(=이스케이프)
+    #ex) <tr> -> &lt;tr&gt;
+    escaped_content = html.escape(self.content)
+
+    # 2. 마크다운 렌더링.
+    # 마크다운 문법(#, * 등)을 html로(=태그) 변환
+    html_content = markdownify(escaped_content)
+
+    # 3. 필요한 HTML만 허용(정제)
+    # 마크다운 문법 적절한 것만 허용.
+    allowed_tags = [
+        'p', 'br',
+        'strong', 'em',
+        'h1', 'h2', 'h3',
+        'ul', 'ol', 'li',
+        'blockquote',
+        'code', 'pre'
+    ]
+
+    cleaned = bleach.clean(
+        html_content,
+        tags=allowed_tags,
+        strip=True
+    )
+
+    return cleaned
+```
+
+이 경우, 내가 원하는 기능을 내는 것은 bleach 없이도 html과 markdownx만으로 충분해 보인다.
+그 후 다시 bleach하는 이유는 최종 html 전체를 검증하는 2차 보안.
+여기서 문제가 되는 게 링크 기능과 이미지 기능
+![이미지](javascript:alert(1)) -> <img src="javascript:alert(1)">
+이미지가 로딩되면 스크립트 실행됨?
+혹은 
+[링크](http://example.com" onclick="alert(1)) -><a href="http://example.com" onclick="alert(1)">링크</a>
+클릭하면 JS 실행됨.여튼 이런 게 처리 과정에서 작동되면 악용될 수 있고 보안을 위협할 수 있는듯.
+실제 이 링크 기능 이용한 취약점
+[외부](http://example.com)
+<a href="http://example.com" target="_blank">
+
+
+그래서 지금 버전은 '링크', '이미지', '테이블', '취소선', '체크리스트' 기능 삭제됨. + h4~6은 없음(# 1개~3개는 유지) + 가로선 없음.
+
+이미지는 헤더 이미지 삽입이나 이미지 첨부 기능을 삽입했으니 필요 x.
+링크는 같은 블로그 내 링크는 허용하고 싶은데.
+
+일단 기능적으로는 가능해도 보안이나 대상 글 삭제시의 오류 등을 가늠하기 어려우니 링크는 패스.
+
+Q : 체크리스트는 왜 통제하에 진행되어야 하지?
+A : input 요소가 포함되기 때문에. html로 <li><input type="checkbox" checked> 완료</li>임. 그런데 여기서 input이 허용된다는게 위험함. 
+<input type="checkbox" onclick="alert(1)"> 이런거 넣으면 바로 클릭시 JS실행되는 XSS 공격 발생.
+<input type="checkbox" style="position:fixed; top:0; left:0; width:100vw; height:100vh;"> 이런걸로 UI를 망가뜨린다던가
+당장은 markdown기능 한계상 막힌 부분이겠지만 나중에 확장되면 문제가 될 수 있다.
+그래서 input의 type, checked속성만 허용하는 조건 + 추가적인 필터링 등으로 강한 통제를 하는 게 좋다.
+내 개인 블로그가 아니라 외부 노출용 블로그니 체크리스트는 불필요할지도.
+
+나머지는 가능.
+
+* 나중에 프로젝트 1단계 마무리하고 오리지널 수정 들어가면 미리보기 부분도 수정하고싶음.
+
+

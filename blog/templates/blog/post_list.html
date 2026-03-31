@@ -20,6 +20,8 @@
     
     <!-- Featured blog post-->
     <!-- 포스트 리스트 -->
+
+    <!--1번 포스트 카드-->
     {% if post_list %}
     <div class="card mb-4" id="post-{{post_list.0.pk}}">  <!-- 첫번째 포스트는별도로 가로 크기 조정 없이, 8 사이즈 전체에 걸쳐.-->
         {% if post_list.0.head_image %}
@@ -35,7 +37,7 @@
                 <span class="badge rounded-pill text-bg-info float-end">미분류</span>  
             {% endif %}
             <h2 class="card-title">{{ post_list.0.title }}</h2>
-            <p class="card-text">{{ post_list.0.content }}</p>
+            <div class="card-text">{{ post_list.0.get_content_markdown | safe }}</div>
             
             {% if post_list.0.tags.exists %}
                 <i class="fa-solid fa-tags"></i>
@@ -57,7 +59,9 @@
     <h3> 아직 작성된 포스트가 없습니다. </h3>
     {% endif %}
     <!-- Nested row for non-featured blog posts-->
-    <div class="row"> <!-- 그 이후 포스트 -->
+    <div class="row"> 
+        
+        <!-- 그 이후 포스트(헤드이미지 유무로 분리) -->
         {% for p in post_list|slice:"1:" %} 
         <div class="col-lg-6">
             <!-- Blog post-->
@@ -76,7 +80,7 @@
                     </div>
 
                     <h2 class="card-title">{{ p.title }}</h2>
-                    <p class="card-text">{{ p.content | truncatewords:15}}</p>
+                    <div class="card-text">{{ p.get_content_markdown | truncatewords_html:15 | safe }}</div>
                     {% if p.tags.exists %}
                         <i class="fa-regular fa-tags" style="color: #74C0FC;"></i>
                         {% for tag in p.tags.iterator %}
@@ -102,7 +106,7 @@
                         {% endif %}
                     </div>
                     <h2 class="card-title">{{ p.title }}</h2>
-                    <p class="card-text">{{ p.content | truncatewords:50}}</p>
+                    <p class="card-text">{{ p.get_content_markdown | truncatewords:50 | safe}}</p>
                     {% if p.tags.exists %}
                         <i class="fa-regular fa-tags" style="color: #74C0FC;"></i>
                         {% for tag in p.tags.iterator %}
