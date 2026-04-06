@@ -1,3 +1,5 @@
+{% load socialaccount %}
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <!--이 내용은 navbar 입니다.-->
     <div class="container">
@@ -9,8 +11,45 @@
                 <li class="nav-item"><a class="nav-link" href="/about_me/">AboutMe</a></li>
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="/blog/">Blog</a></li>
             </ul>
-            <ul class="navbar-nav ms-auto"></ul>
-            <button class="btn btn-sm btn-outline-success" type="button">Login</button>
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ user.username }}
+                    </a>
+                    <div class="dropdown-menu" ara-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="/accounts/logout/"> Log Out </a>
+                    </div>
+                </li>
+                {% else %}
+                <!--로그인버튼-->
+                <li class="nav-item">
+                    <button class="btn btn-sm btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+                </li>
+                {% endif %}
+                <!-- 로그인Modal -->
+                <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="loginModalLabel">Login</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="d-grid row-gap-1 column-gap-4" style="grid-template-columns: 1fr 1fr;"> 
+                                    <!-- d-grid : 디스플레이-그리드 방식. gap-3 : grid 간격(gap) 3으로 설정. 스타일 : 그리드 템플릿의 행을 1칸 | 1칸 구조+동일 비율로 나누기.-->
+                                    <a role="button" class="btn btn-sm btn-outline-dark w-100" href="{% provider_login_url 'google' %}"><i class="fa-brands fa-google"></i> Log in with Google</a>
+                                    <a role="button" class="btn btn-sm btn-outline-dark w-100" href="/accounts/signup/"><i class="fa-regular fa-envelope"></i> Sign up with E-mail</a>
+                                    <a role="button" class="btn btn-sm btn-outline-dark w-100" href="/accounts/login/"><i class="fa-regular fa-envelope"></i> Log in with E-mail</a>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ul>
         </div>
         
     </div>

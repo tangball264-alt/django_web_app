@@ -44,6 +44,13 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'markdownx',
 
+    #로그인
+    'django.contrib.sites', #현재 이 django프로젝트가 어떤 사이트인지 식별하는 시스템. 
+    'allauth',
+    'allauth.account', 
+    'allauth.socialaccount', 
+    'allauth.socialaccount.providers.google',
+
     'blog',
     'single_pages',
 ]
@@ -56,6 +63,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # allauth에서 요구한 미들웨어 추가:
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "django_web_app.urls"
@@ -74,6 +83,17 @@ TEMPLATES = [
         },
     },
 ]
+
+# django allauth 추가하면서 새로 추가.
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
 
 WSGI_APPLICATION = "django_web_app.wsgi.application"
 
@@ -134,3 +154,11 @@ MEDIA_URL = '/media/' #도메인 뒤에 이 경로가 붙으면 미디어 파일
 MEDIA_ROOT = os.path.join(BASE_DIR, '_media') #베이스 디렉토리(=프로젝트 폴더) 아래 _media 라는 폴더를 만들고 여기에 이미지 파일을 저장
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+
+# 로그인 시 이메일 처리
+ACCOUNT_EMAIL_REQUIRED= True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# 로그인 리다이렉트 : 포스트 리스트 페이지로
+LOGIN_REDIRECT_URL = '/blog/'
