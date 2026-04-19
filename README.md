@@ -1142,3 +1142,109 @@ A : input 요소가 포함되기 때문에. html로 <li><input type="checkbox" c
   - 로그아웃 기능 넣기
   - 로그인 모달 버튼 조정.
 8. 커밋
+
+## 38일차
+폼으로 댓글 기능 구현하기
+
+1. Comment 모델 추가
+  - 댓글이 작성된 포스트, 댓글 작성자, 댓글 내용, 댓글의 작성 날짜와 수정일자.
+  - __str__로 작성자와 내용을 반환
+  - 향후 따로 포스트+댓글번호를 pk삼고 모델을 수정하여 댓글번호를 기준으로 하는 대댓글 기능 추가할수 있으려나.
+2. 데이터베이스에 반영
+  - makemigrations와 migrate 수행.
+3. admin 수정
+  - admin.site.regester(Comment)
+4. 확인
+  - admin에 정상적으로 추가됨. 작성 가능.
+5. 포스트 상세 페이지 댓글 구조 확인
+  - 댓글 작성 폼 한칸(완료 버튼 없음). 작성자프로필아이콘+작성자이름+내용 출력. 댓글과 대댓글 모두 존재.
+  - 우리 댓글 구조상 댓글 아래 댓글을 작성하는 건 어려울 거 같은데. 이 기능은 삭제하고 나중에 추가하던가 해야 할듯.
+  - comment-area 섹션, 각 코멘트에는 구분 없이 div.ms-3
+6. 포스트 상세 페이지의 댓글 테스트코드 작성
+7. 포스트 상세 페이지 html 수정(댓글 출력)
+8. 테스트
+9. admin에 view on site 만들어서 댓글 작성 시 바로가기.
+
+## 39일차
+간만에 복귀
+지난번에 38일차에 정리한 할일 중 5까지 했고, 6부터?
+
+6. 댓글 테스트코드 작성하기
+- setUp 함수에 댓글 추가하기.
+- test_post_detail함수에 comment 확인 내용 추가하기.
+- 테스트코드에서 확인할 요소의 명칭이 교재와 내 코드가 일치하는가?
+- 각 코멘트에 id='comment-1'이 없음. 이건 post_detail 수정하면서 넣어야 할듯. 
+
+7. post_detail.html 수정
+교재 내용
+{% if post.comment_set.exists %} 
+  {% for comment in post.comment_set.iterator %} 
+    <div class="media md-4" id="comment-{{comment.pk}}"> 
+      <img class="d-vlex mr-3 rounded-circle" src="http://placehold.it/50x50" alt=""> 
+      <div class="media-body"> 
+        <h5 class="mt-0">{{ comment.author.username }} &nbsp;&nbsp;<small class="text-muted">{{ comment.created_at }}</small> 
+        </h5> 
+        <p>{{ comment.content | linebreaks }}</p> 
+      </div> 
+    </div> 
+  {% endfor %} 
+{% endif %}
+
+내 디자인에 맞추어 수정하려면
+
+전후의 if, for는 유지
+ for comment in post.comment_set.iterator -> 이터레이터 대신 all 사용을 권고받음. 이유와 특성 파악할것
+ django 템플릿은 기본적으로 템플릿 엔진이 내부적으로 자동 번복 처리. 이거 안써도 반복 가능.
+ 하지만 실무적 관점에서 '수천 개의 댓글'쯤 되면 이터레이터를 쓰는 게 맞다.
+ 테스트하며 이터레이터를 유지할 때와 없앨 시를 비교해보고 차이를 확인할 것. 동일하다면 지울 생각.
+id comment-1은 <div class="d-flex">에. mb-4도 함께 적용. 왜?
+프로필 이미지 파트는 아직 안건들것.
+댓글 내용은 ms-3 유지.
+작성자 부분은 fw-bold 안에 넣는 것 유지. created_at부분은 교재것 따올것.
+본문은 내 것은 별도로 태그 없음. 교재 따와서 p로.
+ 본문의 linebreaks의 의미 : 텍스트의 줄바꿈을 html로 변환해 <p><br> 자동 생성.
+ p중복 -> 바깥에 p를 지우거나, linebreaksbr로 수정.
+
+8. 테스트
+
+테스트-실패
+social account가 테스트에서 문제를 일으킴. 
+{% get_providers as socialaccount_providers %}
+
+{% if socialaccount_providers %}
+<a role="button" class="btn btn-sm btn-outline-dark w-100"
+   href="{% provider_login_url 'google' %}">
+   <i class="fa-brands fa-google"></i> Log in with Google
+</a>
+{% endif %}
+이걸로 provider가 실제 존재할 때에만 그 앱을 적용한 파트를 허용.
+
+테스트-실패
+comment-area가 div아니고 section
+
+테스트-실패
+로그인 모달의 타이틀(Login)이 카테고리 페이지, 태그 페이지의 타이틀보다 위에 위치해서 인식 오류. 
+로그인 모달 타이틀을 h5로 수정.
+실제 텍스트 크기에는 변동 없음.(사유 : 부트스트랩5 공식 모달 타이틀은 h5)
+
+테스트-성공
+
+
+9. admin에 view on site 만들어서 댓글 작성 시 바로가기.
+models에서 comment모델에 get_absolute_url함수 추가
+그 함수 출력은 post모델의 get_absolute_url + #comment-pk
+
+문제 발생 : view on site하면 다른 것들도 http//주소 로 나옴.
+http://으로 나와야 정상인데.
+
+admin-site에서 Site 도메인을 http://127.0.0.1:8000에서 http://을 제거.
+원래 django에서 http://을 제공하기에 중복으로 오류 날 수 있다고.
+도메인 이름 : 127.0.0.1:8000
+이후 정상 작동.
+
+포스트, 댓글 모두 view on site 정상 작동 확인.
+댓글 작성도 정상 작동.
+
+**단, 댓글 작성 폼에 '입력'버튼 없음**
+입력버튼 만들고, 로그인 상태에서만 보여지도록 수정할 것.
+
