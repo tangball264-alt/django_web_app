@@ -1,5 +1,5 @@
 {% extends 'blog/base.html' %} <!-- base.html을 확장해 이 html에 넣기. -->
-
+{% load crispy_forms_tags %}
 {% block head_title %}
 Blog Post - {{post.title}}
 {% endblock %}
@@ -54,36 +54,26 @@ Blog Post - {{post.title}}
     </article>
     <!-- Comments section(댓글란)-->
     <section class="mb-5" id="comment-area">
-        <div class="card bg-light">
+        <div class="card my-4">
+            <div class="card-header">Leave a Comment:</div>
             <div class="card-body">
                 <!-- 댓글 작성 폼 -->
-                <form class="mb-4"><textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea></form>
-                <!-- 댓글(대댓글 보유) - 삭제대상. 엔터 공간에는 '부모 댓글', '자식 댓글1,2'-->
-<!--                <div class="d-flex mb-4">
-                    
-                    <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
-                    <div class="ms-3">
-                        <div class="fw-bold">Commenter Name</div>
-                        If you're going to lead a space frontier, it has to be government; it'll never be private enterprise. Because the space frontier is dangerous, and it's expensive, and it has unquantified risks.
-                        
-                        <div class="d-flex mt-4">
-                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
-                            <div class="ms-3">
-                                <div class="fw-bold">Commenter Name</div>
-                                And under those conditions, you cannot establish a capital-market evaluation of that enterprise. You can't get investors.
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex mt-4">
-                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..."></div>
-                            <div class="ms-3">
-                                <div class="fw-bold">Commenter Name</div>
-                                When you put money directly to a problem, it makes a good headline.
-                            </div>
-                        </div>
+                
+                {% if user.is_authenticated %}
+                <form id="comment-form" method="POST" action="{{ post.get_absolute_url }}new_comment/">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ comment_form | crispy }}
                     </div>
-                </div>
--->
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+
+                {% else %}
+                    <div class="d-grid gap-2">
+                        <a role="button" class="btn btn-outline-dark  btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Log in and leave a comment</a>
+                    </div>
+                {% endif %}
+                <br>
                 {% if post.comment_set.exists %}
                     {% for comment in post.comment_set.iterator %}
                     <!-- Single comment-->

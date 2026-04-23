@@ -333,3 +333,52 @@ class TestView(TestCase):
         self.assertNotIn('python', main_area.text)
         
 
+    def test_comment_form(self):
+        # 포스트001을 대상으로 진행
+        # 댓글 개수 확인 + 포스트001의 댓글 개수 확인
+        self.assertEqual(Comment.objects.count(),1)
+        self.assertEqual(self.post_001.comment_set.count(),1)
+
+        # 로그인 전 상태 확인
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('section', id='comment-area')
+        self.assertIn('Log in and leave a comment', comment_area.text)
+        self.assertFalse(comment_area.find('form', id='comment-form'))
+
+        # 로그인 후 확인 
+        self.client.login(username='eddi', password = 'somepassword')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('section', id='comment-area')
+        self.assertNotIn('Log in and leave a comment', comment_area.text)
+
+        
+        comment_form = comment_area.find('form', id='comment-form')
+        self.assertTrue(comment_form.find('textarea', id='id_content'))
+        response = self.client.post(
+            self.post_001.get_absolute_url() + 'new_comment/',
+            {
+                'content' : "에디의 댓글입니다.",
+            },
+            follow=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Comment.objects.count(),2)
+        self.assertEqual(self.post_001.comment_set.count(),2)
+        new_comment = Comment.objects.last()
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIn(new_comment.post.title, soup.title.text)
+
+        comment_area = soup.find('section', id='comment-area')
+        new_comment_div = comment_area.find('div', id=f'comment-{new_comment.pk}')
+        self.assertIn('eddi', new_comment_div.text)
+        self.assertIn('에디의 댓글입니다.', new_comment_div.text)
+        

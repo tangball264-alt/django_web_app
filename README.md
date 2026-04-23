@@ -1248,3 +1248,74 @@ admin-site에서 Site 도메인을 http://127.0.0.1:8000에서 http://을 제거
 **단, 댓글 작성 폼에 '입력'버튼 없음**
 입력버튼 만들고, 로그인 상태에서만 보여지도록 수정할 것.
 
+## 40일차
+댓글 작성 폼 구현하기
+
+1. 댓글 작성 폼을 위한 테스트 코드 작성
+- 셋업 함수에 댓글이 하나 존재.
+- 로그인하지 않은 상태 : 
+  댓글 영역에서, Log in and leave a comment 문구를 확인하고, form이 없는것을 확인
+- 로그인한 상태 : 
+  로그인한다.
+  Log in and leave a comment 문구가 없고, 대신 댓글 폼이 존재. 그 안에 textarea가 있다.
+  새 댓글을 작성해 서버에 보내고, 결과를 받는다. 댓글 수가 늘어난다. 리다이렉트를 확인한다. 가져온 댓글의 내용과 저자가 일치한다.
+2. 로그인 상태에 따라 댓글 입력란 또는 로그인 버튼 나타내기
+- 교재 내용과 부트스트랩 버전이 다름. 그에 따른 변화를 확인해야 한다.
+- runserver 결과 로그인 상태에서는 입력란과 submit 버튼이 보인다.
+  그러나, submit 시도 시 오류가 나온다(page not found(404))
+  The current path, blog/18/new_comment/, didn’t match any of these.
+  사실상 댓글 입력란만 구현하고 댓글 폼 구현은 아직인 탓으로 추정.
+  버전차이는 우선 댓글 폼 구현을 마치고 확인하며 조정해야 할  것.
+- 추가적으로는 디자인 차이 등도 있음.
+3. 댓글 폼 구현
+- blog/forms.py 파일을 만들어 필드를 추가할 것.
+- forms가 뭔지, 왜 쓰는건지 확인해야겠어. 특히, 이전에 다른데서 form 쓴거는 왜 이렇게 안했는지, 무슨 차이가 있는지도.
+- views.py수정.
+- html 수정 + crispy 적용
+- urls.py 수정해 경로 추가. path('<int:pk>/new_comment/', views.new_comment),
+- views.py 수정해 new_comment()함수 구현 -> 교재 오타 추정. 닫는 괄호 하나의 위치 잘못됨(479p)
+4. 테스트
+- comment-area가 div가 아닌 section이라 생긴 오류-수정 완료.
+- 테스트 성공
+5. 저장
+저장에 앞서 runserver하며 버전 오차 수정하고 디자인 정돈하기.
+실제 런서버 결과 오류 발생.
+
+Forbidden (403)
+CSRF verification failed. Request aborted.
+Help
+Reason given for failure:
+    CSRF token missing.
+You can customize this page using the CSRF_FAILURE_VIEW setting.
+따라서 post_detail의 form-group 앞에 csrf_token 넣기.
+수정 마치자 댓글 작성됨.
+
+
+ModelForm 사용 시:
+모델 구조와 자동 연동
+유효성 검사 자동 처리
+.save()로 바로 DB 저장 가능
+
+
+
+부트스트랩 변화로 인한 수정 사항
+1. form-group 제거됨. 해당 내용 제거하거나, mb-3 등으로 조정하기
+>Dropped form-specific layout classes for our grid system. Use our grid and utilities instead of .form-group, .form-row, or .form-inline.
+>
+> https://getbootstrap.com/docs/5.0/migration/#forms
+ 
+2. btn-block 삭제됨. w-100등으로 수정할 것.
+>Dropped .btn-block for utilities. Instead of using .btn-block on the .btn, wrap your buttons with .d-grid and a .gap-* utility to space them as needed. Switch to responsive classes for even more control over them.
+>
+> https://getbootstrap.com/docs/5.0/migration/#buttons
+3. data-toggle, data-target 등 JS속성 네이밍 변경됨. data-bs-toggle, data-bs-target 등으로 수정하기
+>Data attributes for all JavaScript plugins are now namespaced to help distinguish Bootstrap functionality from third parties and your own code. For example, we use data-bs-toggle instead of data-toggle.
+>
+> https://getbootstrap.com/docs/5.0/migration/#javascript
+
+위의 3가지 전부 수정
+댓글창의 card-header 추가.
+댓글 입력창 혹은 로그인 버튼이 댓글과 너무 붙음. <br>로 처리
+폼 상하 길이 조정
+폼의 라벨 제거
+
