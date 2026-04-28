@@ -382,3 +382,56 @@ class TestView(TestCase):
         self.assertIn('eddi', new_comment_div.text)
         self.assertIn('에디의 댓글입니다.', new_comment_div.text)
         
+    def test_comment_update(self):
+        # 다른 작성자의 새 댓글 생성
+        comment_by_tangball = Comment.objects.create(
+            post = self.post_001,
+            author = self.user_tangball,
+            content = 'tangball의 댓글입니다.'
+        )
+
+        # 로그인 안한 상태
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('section', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-update-btn'))
+        self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
+
+        # 로그인(기존 댓글의 작성자)
+        self.client.login(username='eddi', password = 'somepassword')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        # 다른 작성자의 댓글에는 수정 버튼이 없다.
+        comment_area = soup.find('section', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
+        # 내 댓글에는 수정 버튼이 있고, 그 버튼의 링크는 정상이다.
+        comment_001_update_btn = comment_area.find('a', id='comment-1-update-btn')
+        self.assertIn('수정', comment_001_update_btn.text)
+        self.assertEqual(comment_001_update_btn.attrs['href'], '/blog/update_comment/1/')
+
+        # 실제 수정 부분
+        response = self.client.get('/blog/update_comment/1/')
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertEqual('Edit Comment - Blog', soup.title.text)
+        update_comment_form = soup.find('form', id='comment-form')
+        content_textarea = update_comment_form.find('textarea', id='id_content')
+        self.assertIn(self.comment_001.content, content_textarea.text)
+
+        response = self.client.post(
+            f'/blog/update_comment/{self.comment_001.pk}/',
+            {
+                'content': "에디의 댓글을 수정합니다.",
+            },
+            follow=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.comment_001_div = soup.find('div', id='comment-1')
+        self.assertIn('에디의 댓글을 수정합니다.', self.comment_001_div.text)
+        self.assertIn('Updated: ', self.comment_001_div.text)

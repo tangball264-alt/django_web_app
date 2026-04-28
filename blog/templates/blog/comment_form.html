@@ -1,0 +1,16 @@
+{% extends 'blog/base_full_width.html' %} <!-- base.html을 확장해 이 html에 넣기. -->
+{% load crispy_forms_tags %} <!--폼 모양 꾸미기용-->
+{% block head_title %}Edit Comment - Blog{% endblock %}
+
+{% block main_area %}
+<!--이 내용은 Comment_update_form입니다.-->
+
+<h1>댓글 수정하기</h1>
+<hr/>
+<form method="post" id="comment-form">{% csrf_token %} <!--csrf토큰 : 웹사이트를 csrf공격으로부터 보호하기 위한 장고 제공 기능. 폼 사용시 필수로 쓸 것.-->
+    {{ form | crispy}}
+    <br/>
+    <button type="submit" class="btn btn-primary float-end">완료</button>
+</form>
+
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
 from .forms import CommentForm
@@ -106,7 +106,16 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
 
         return response
 
-        
+class CommentUpdate(LoginRequiredMixin, UpdateView):
+    model=Comment
+    form_class=CommentForm
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user==self.get_object().author:
+            return super(CommentUpdate, self).dispatch(request, *args, **kwargs)
+            # 위에서 super().으로 작성할 수도 있으나, 이 코드는 교재에 따라 명시적으로 표기하는 구버전을 사용
+        else : 
+            raise PermissionDenied
 
 
 def category_page(request, slug): #위의 둘과 달리 FBV 방식. 필수인 request와 추가적으로 slug를 매개변수로 받는다.
