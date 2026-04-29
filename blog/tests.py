@@ -435,3 +435,57 @@ class TestView(TestCase):
         self.comment_001_div = soup.find('div', id='comment-1')
         self.assertIn('에디의 댓글을 수정합니다.', self.comment_001_div.text)
         self.assertIn('Updated: ', self.comment_001_div.text)
+
+    def test_comment_delete(self):
+        comment_by_tangball = Comment.objects.create(
+            post = self.post_001,
+            author = self.user_tangball,
+            content = 'tangball의 댓글입니다.'
+        )
+
+        self.assertEqual(Comment.objects.count(),2)
+        self.assertEqual(self.post_001.comment_set.count(),2)
+
+        # 로그인 안한 상태
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('section', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-delete-btn'))
+        self.assertFalse(comment_area.find('a', id='comment-2-delete-btn'))
+
+        # 로그인(새 댓글의 작성자)
+        self.client.login(username='tangball', password = 'somepassword')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        # 다른 작성자의 댓글에는 삭제 버튼이 없다.
+        comment_area = soup.find('section', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-delete-modal-btn'))
+        # 내 댓글에는 삭제 버튼이 있고, 그 버튼은 모달과 연결된다.
+        comment_001_delete_modal_btn = comment_area.find('a', id='comment-2-delete-modal-btn')
+        self.assertIn('삭제', comment_001_delete_modal_btn.text)
+        self.assertEqual(comment_001_delete_modal_btn.attrs['data-bs-target'], '#deleteCommentModal-2')
+
+        # 모달 확인
+        delete_comment_modal_002 = soup.find('div', id='deleteCommentModal-2')
+        self.assertIn('정말 삭제하시겠습니까?', delete_comment_modal_002.text)
+        really_delete_btn_002 = delete_comment_modal_002.find('a')
+        self.assertIn('삭제', really_delete_btn_002.text)
+        self.assertEqual(
+            really_delete_btn_002.attrs['href'], '/blog/delete_comment/2/'
+        )
+
+        response = self.client.get('/blog/delete_comment/2/', follow=True)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertIn(self.post_001.title, soup.title.text)
+
+        comment_area = soup.find('section', id='comment-area')
+        self.assertNotIn('tangball', comment_area.text)
+        self.assertNotIn('tangball의 댓글입니다.', comment_area.text)
+        
+        self.assertEqual(Comment.objects.count(),1)
+        self.assertEqual(self.post_001.comment_set.count(),1)
