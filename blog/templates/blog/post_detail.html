@@ -88,7 +88,7 @@ Blog Post - {{post.title}}
                                 </small>
                             </div>
                             {{ comment.content|linebreaks }}
-                            {% if comment.created_at != comment.modified_at %}
+                            {% if comment.is_edited == True %}
                                 <p class="text-muted float-end"><small>Updated: {{ comment.modified_at }}</small></p>
                             {% endif %}
                         </div>

@@ -1382,3 +1382,40 @@ test-ok.
 - 정상 삭제 확인
 
 
+
+ updated 날짜 출력을 수정된 댓글에만 하기.
+created_at은 auto_now_add고 modified_at은 auto_now임.
+이에 따라 마이크로초 가량의 차이가 발생하고, 결과적으로 컴퓨터는 둘을 다르다고 인식.
+```
+{% if comment.created_at != comment.modified_at %} 
+  <p class="text-muted float-end"><small>Updated: {{ comment.modified_at }}</small></p> 
+{% endif %}
+```
+이 부분이 모든 댓글에서 작동한다.
+auto_now_add는 생성 순간을 기록.
+auto now는 save된 시점의 시간 기록.
+
+그리고 views의 new_comment함수를 보면 commit=false상태로 한번 save하고 이후 한 번 더 save한다. 그리고 modelform.save도 있고, auto_naw의 차이도 있어서 내부에서는 미약한 차이가 발생.
+
+따라서 이를 수정하기 위한 방법
+1. is_edited로 수정 여부를 별도로 기록하고 이에 따라 업데이트 시점을 표기
+- 장점 : 가장 정확하고 확장성 좋음.
+- 단점 : 모델 변경 필요. 데이터와 로직의 분리.
+2. created_at과 modified_at의 차이가 1초 이상일 때에만 updated time을 표시한다.
+- 장점 : 모델 수정 없고 구현이 간단.
+- 단점 : 정확도 조금 부족. 환경에 따라 결과 차이날수도.
+3. created_at과 modified_at이 사용자에게 보이는 기준으로 동일하면 업데이트 표기.
+- 장점 : 구현 간단하고 사용자 관점에서 자연스럽다.
+- 단점 : 포맷에 의존하여 포맷 변경에 로직이 영향받을 수 있음. 작성 직후 수정시 표시 안될수도. 
+
+1번으로 진행할 것.
+
+1. models.py수정
+- Comment 모델에 is_edited 필드를 추가한다.
+- 이를 마이그레이션 한다(makemigrations, migrate)
+2. views.py를 수정한다.
+- form_valid함수를 추가로 오버라이드 한다.
+- 그 안에서 is_edited를 true로 설정하고, 나머지는 super로 진행.
+
+실제 runserver로 확인하자 정상 출력됨.
+단, 기존에 수정한 것까지 바뀌는 건 아니고, 이제 새로 수정 해서 edited 수정하면.

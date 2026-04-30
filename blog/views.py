@@ -116,6 +116,10 @@ class CommentUpdate(LoginRequiredMixin, UpdateView):
             # 위에서 super().으로 작성할 수도 있으나, 이 코드는 교재에 따라 명시적으로 표기하는 구버전을 사용
         else : 
             raise PermissionDenied
+    
+    def form_valid(self, form):
+        form.instance.is_edited = True
+        return super().form_valid(form)
 
 
 def category_page(request, slug): #위의 둘과 달리 FBV 방식. 필수인 request와 추가적으로 slug를 매개변수로 받는다.
