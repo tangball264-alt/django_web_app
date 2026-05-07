@@ -1419,3 +1419,70 @@ auto now는 save된 시점의 시간 기록.
 
 실제 runserver로 확인하자 정상 출력됨.
 단, 기존에 수정한 것까지 바뀌는 건 아니고, 이제 새로 수정 해서 edited 수정하면.
+
+## 44일차
+기타 편의 기능 구현하기
+1. 포스트 페이지 여러 개로 나누기
+2. 검색 기능 구현
+3. 사용자 아바타(프로필사진) 추가 및 출력
+
+일단 포스트 페이지 분리부터.
+포스트 리스트의 <!-- Pagination--> 파트에 관련 디자인 있음
+필요한 것.
+1. 포스트 개수별 필요 페이지 수 도출 기능(페이지당 출력 포스트 : 5)
+2. 그에 맞추어 페이지네이션 숫자 조정
+3. 현재 페이지 표시, 그에 맞추어 페이지 이동 숫자 조정
+4. 페이지 이동 기능 추가. 그에 따라 다른 포스트가 출력이 되는지
+* 최신 포스트는 넓게 출력되니까 2페이지부터는 6개 출력되게 조정할지
+* 교재는 '이전 페이지', '다음 페이지' 뿐이니까 나는 숫자 페이지로 출력 괜찮은지 검토.
+
+교재 내용
+1. 포스트 추가
+- 포스트를 추가하던 중, admin에서 포스트의 content를 작성할 때, 반응형 웹 기준으로 70~100% 범위 가량의 크기일 때 content의 textarea가 비정상적으로 커지는 문제 확인
+- admin에만 markdownx를 끄는 방식으로 해결 가능할 것으로 추정.
+```
+#admin.py에 추가.
+from django.db import models
+from django import forms
+
+class PostAdmin(admin.ModelAdmin):
+    # MarkdownxField(또는 TextField)를 관리자 페이지에서만 일반 Textarea로 변경
+    formfield_overrides = {
+        models.TextField: {'widget': forms.Textarea},
+    }
+
+# 기존의 admin.site.register(Post) 대신 아래와 같이 등록
+admin.site.unregister(Post) # 이미 등록되어 있다면 해제 후 다시 등록
+admin.site.register(Post, PostAdmin)
+# 이 코드를 이용해 특정 필드 타입의 위젯을 원하는대로 조정.
+```
+- 실패. 일단 수정 시도내용을 삭제
+```
+from .models import Post
+from markdownx.admin import MarkdownxModelAdmin
+from markdownx.widgets import AdminMarkdownxWidget
+from django.db import models
+
+class PostAdmin(MarkdownxModelAdmin):
+    formfield_overrides = {
+        models.TextField: {'widget': AdminMarkdownxWidget(attrs={'style': 'width:100%; min-height:500px;'})},
+    }
+
+admin.site.register(Post, PostAdmin)
+```
+- 이걸로 css를 수정. 기본 높이가 조금 긴 편이지만 포스트 특성상 길어도 되고, 글자 줄에 맞추어 적절히 늘어나는 것도 확인함.
+- 그리고 포스트 개수는 충분하다.
+2.views의 포스트리스트 클래스에서 paginate_by = 5 지정
+(리스트뷰가 기본 제공하는 기능)
+3. order, newer 버튼 구상/만들기
+* 이 부분에서 내 것과 차이가 큼. 그리고 1페이지가 최신이니 두 버튼 위치도 조정할 것.
+- 나는 <-, 1, 2, 3, 4, 5 ,-> 이정도로 구상중.
+- 기능 수정. 예를들어 1페이지일때는 [1] 2 3 4 5 대신 [1] 2 3 만 나오고 2페이지면 1 [2] 3 4 이렇게. 
+4. html의 pagenation 수정. listview가 제공하는 page_obj 이용.
+- 일단 기본 기능으로 <<와 >>를 추가. 실제 이동이 되는 것을 확인. if문으로 이미1페이지, 마지막페이지일경우 disabled처리.
+- 구현 : 현재 페이지 수에 따라 1페이지부터 for문으로 수행(num)
+        num이 '현재페이지(=number)'-2보다 크고 +2보다 작으면 버튼을 만든다.
+        이 때, num==number면 버튼을 active로 만든다.
+
+
+
