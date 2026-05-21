@@ -1485,4 +1485,83 @@ admin.site.register(Post, PostAdmin)
         이 때, num==number면 버튼을 active로 만든다.
 
 
+## 45일차
+44일차에 고려한 페이지 숫자 버튼 완성 및 저장.
 
+검색 기능
+1. 위젯-검색창에 검색하기.(검색 버튼 or enter키)
+2. 자바스크립트를 사용하여 enter키를 인식.
+
+3. base.html수정 : 검색 창 내용을 서버로 전달(onclick조건으로)
+- widgets 사용하는 줄 알았더니, base에 중복으로 존재하고, 그 쪽을 사용하고 있었음. 
+- 따라서 일단 base를 수정하고, 나중에 이를 widgets로 분리하는 작업을 수행할 것.
+
+원본 템플릿
+```html
+<div class="input-group">
+  <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+  <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+</div>
+```
+교재와 다른 부분 : 
+1. input태그에 aria-속성들로 시각장애인을 위한 정보를 제공(스크린 리더 기능) 없어도 되지만 있는 게 표준적.
+2. input 태그에 구 표준인 XHTML/XML을 엄격히 적용하여 닫기 슬래시/를 붙임. 현 표준인 HTML5는 안 붙여도 인식하므로 지워도 됨. 나는 지금까지 내용의 통일성을 위해 지우기로 함.
+3. span 태그가 없음. 교재엔 버튼 그룹인 span태그가 있는데, 현 부트스트랩에선 버튼 그룹이 사라졌으므로 없음.
+4. 버튼 태그 id. 교재에는 없음. 삭제할 이유가 없어 그대로 유지할 것. 
+5. 버튼 태그의 클래스가 세컨더리가 아니라 프라이머리 디자인 사용.
+
+교재를 따라 이제 추가하는 부분 :
+1. 인풋 태그의 id. input요소 안의 값을 가져와 검색하기 위해 search-input이라는 id를 부여.
+2. button을 클릭하면 검색 창 내용을 서버로 전달하기 위해 onclick="searchPost();"를 추가.
+3. 그리고 script 태그 안에 자바스크립트 함수 searchPost()를 작성한다.
+- 함수 내용 : id가 search-input인 태그(입력창)의 안에 있는 값(value)를 앞뒤 공백 등을 제거하고(trim) 텍스트만 받아오기.
+그리고 그 길이가 1자면 검색어가 짧다는 알림.
+1자 초과시 location.href="블로그/서치/검색어/"로 주소 들어가기. 
+
+*location.href : 현재 웹 브라우저의 주소창에 입력된 url을 가리킴. 여기에 새 주소를 대입하면 그 주소로 바로 이동. a href로 지시하는것과 같은 기능인데 자바스크립트에서 하는 법.*
+
+검색어 길이 검사가 정상적으로 작동한다.
+
+제대로 된 검색어로 다시 검색을 시도하면, 해당 주소가 아직 없기 때문에 성공적으로 오류 발생.
+
+4. 자바스크립트 수정. enter로도 동일한 작동을 하도록.
+5. 테스트코드 작성.
+6. urls.py수정 및 views.py수정.
+
+
+## 46일차
+views에 들어가는 Q관련해서 조사하다가 45일차 끝남.
+
+7. 테스트하기
+- failed
+
+>    self.assertIn('Search : 파이썬 (2)', main_area.text)
+>
+>                                       ^^^^^^^^^^^^^^
+>
+> AttributeError: 'NoneType' object has no attribute 'text'
+
+html에 이 부분 출력을 아직 구현 안함.
+
+search-info를 값으로 넘겨 받아 사용할 수 있게 하기.
+
+h1 부분을 수정하여 삽입.
+
+- failed
+- 추가 오류 발견. 큰 오류가 아니라 자잘한 오타나 ''위치 실수 등. 수정함.
+
+
+그래서 runserver로 테스트 플레이 했는데 정상적으로 나옴.
+
+교재의 요구는 완료.
+
+다만 검색어에 /를 붙이면 /가 주소의 일부로 인지되어서 404 not found 오류 발생. 이 부분을 해결해둬야 할 듯.
+
+
+방법1 : encodeURIComponent()를 이용하여 searchValue의 특수문자를 특수 기호 코드로 인코딩.
+
+결과  : 실패. 자동으로 다시 디코딩된 것으로 추정.
+
+방법2 : url의 path를 <str:q>에서 <path:q>로 수정.
+
+결과 : 성공.

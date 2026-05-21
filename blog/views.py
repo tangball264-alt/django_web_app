@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
 from .forms import CommentForm
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 # Create your views here.
 class PostList(ListView):
@@ -122,6 +123,25 @@ class CommentUpdate(LoginRequiredMixin, UpdateView):
         form.instance.is_edited = True
         return super().form_valid(form)
 
+class PostSearch(PostList): #포스트 리스트를 상속. 포스트 리스트 페이지를 기본으로 보여준다.
+    paginate_by = None #페이징 비활성화.
+
+    def get_queryset(self): 
+        #데이터베이스에서 어떤 포스트를 가져올 것인가.
+        q = self.kwargs['q'] 
+        #주소를 통해 전달된 <str:q>를 본다.
+        post_list = Post.objects.filter(
+            Q(title__contains=q) | Q(tags__name__contains=q) #Q임포트
+            #django의 Q객체를 이용하여 여러 쿼리를 OR수행.
+        ).distinct() #한 포스트가 제목-태그 중복으로 걸리면 중복제거.
+        return post_list
+    
+    def get_context_data(self, **kwargs): #html템플릿문서로 보낼 화면 데이터(context)를 추가.
+        context = super(PostSearch, self).get_context_data()
+        q = self.kwargs['q']
+        context['search_info'] = f'Search : {q} ({self.get_queryset().count()})'
+        #페이지 상단에 출력할 안내문구가 될 search_info변수를 생성.
+        return context
 
 def category_page(request, slug): #위의 둘과 달리 FBV 방식. 필수인 request와 추가적으로 slug를 매개변수로 받는다.
     if slug == 'no_category':

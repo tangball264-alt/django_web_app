@@ -13,7 +13,8 @@ urlpatterns = [
     path('update_comment/<int:pk>/', views.CommentUpdate.as_view()),
     path('create_post/', views.PostCreate.as_view()),
     path('update_post/<int:pk>/', views.PostUpdate.as_view()),
-    path('delete_comment/<int:pk>/', views.delete_comment)
+    path('delete_comment/<int:pk>/', views.delete_comment),
+    path('search/<path:q>/', views.PostSearch.as_view())
 ]
 #현재 존재하는 페이지
 #포스트 목록
