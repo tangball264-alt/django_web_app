@@ -1617,3 +1617,88 @@ UI Avatars 사용할 것.
 단점은 서비스 유연성 저하? 랑 회원정보 변경시 함께 아바타 업데이트 해주는 로직 등 필요.
 + 이미지 저장으로 인한 용량 저하.
 
+## 47일차
+대문 페이지 완성하기
+
+싱글 페이지 앱으로 분리해 둔 부분. 
+
+1. landing.html 꾸미기(부트스트랩, 자바스크립트 사용)
+- blog/navbar.html을 include
+- navbar가 '현재 페이지 표시' 못하는 중. 수정.
+2. 부트스트랩 적용 확인
+3. landing.css파일 추가 + 이미지 추가 -> 모양 다듬기
+
+현재 페이지 표시 기능 만듦. 구체적 코드는 ai 참고해서.
+footer표시.
+
+## 48일차
+한동안 집중 어려움.
+landing.html에 적용할 자바스크립트 + bootstrap은 이제부터 해야 함. 로그인 버튼이 안 눌리는 것 확인.
+
+1. 부트스트랩 연결 성공 : 교재 코드 그대로 가도 됨.static/blog는 추가로 안해도 경로 전에 static 있으니 인식된다.  오히려 static 넣었다가 부트스트랩 다 풀리고 엉망.
+2. 폰트어썸 연결 : blog/base거 그대로 복사해옴.
+3. js연결 : 이것도 버전 변하면서 필요량이 줄어들었다. j쿼리 어쩌고 하는 줄 빼고, jsdeliever인가랑 부트스트랩 js. 결과적으로 각종 기호 정상 출력됨.
+
+다음 단계는 css추가와 이미지 삽입.
+
+## 49일차
+
+landing.css 추가하고 이미지 추가해서 모양 다듬기.
+
+문제 : landing과 blog 페이지의 navbar가 다름.
+css문제인가?
+
+## 50일차
+소개글과 디자인 수정하기.
+- 글의 배치나 간격, 패딩 등. -> div class로 묶어서 해결.
+
+대문에 최신 포스트 나타내기
+- landing.html에 카드 추가.
+
+Blog - 최근 게시글
+포스트 제목 1
+포스트 제목 2
+
+
+여기에 추가로 하고 싶은 기능은 최근 게시글 카드를 클릭해 해당 포스트로 바로가기 기능.
+
+
+## 51일차
+최신 포스트 테스트 코드 작성하기
+1. 테스트 코드 작성(TestView클래스의 setUp과 test_landing
+2. views에서 landing을 수정해 recent_posts를 보내기.
+3. html에서 받아 보이기.
+- 부트스트랩 버전 변경에 따라 수정하기.
+- 오류 발생. 정상적으로 출력 안됨.
+- 버전 변경에 따른 수정에서 일부 누락됨. badge 부분 내용 수정
+badge badge-pill badge-light float-right -> badge rounded-pill bg-light text-dark float-end
+round로 오타 + text-dark 누락 등 일부 문제 발견 및 해결
+
+test-ok
+
+
+이후 추가하고 싶은 것
+- 링크를 title이 아닌 card 전체에 걸기.
+
+
+다음 단계
+
+작성자의 아바타 추가하기 + 카드 배경 흐리게.
+- blog/models.py에서 post모델에 comment모델에 쓴 get_avatar_url()함수를 복붙
+- landing.html을 수정하여 이미지 넣기
+- landing.css를 수정하여 card요소의 투명도(alpha) 조정.
+
+## 52일차
+
+get_avatar_url 함수 옮기기
+landing.html수정
+
+## 53일차
+요 며칠 얼마 못해서 오늘은 집중하기.
+
+포스트 카드 투명도 추가(landing.css 카드 rgba 255, 255, 255, 0.6 조정.)
+-> 작동 안함.
+-> 사유 : 이전 landing.html에서 ai 수정안으로 card class에 bg-white를 추가했었음.
+해당 부분 삭제하자 정상적으로 작동하는 것 확인.
+
+
