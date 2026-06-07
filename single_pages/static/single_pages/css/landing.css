@@ -1,3 +1,7 @@
+/* 두 페이지 간 스크롤바 유무로 인한 가로 위치 튐 현상 방지 */
+html {
+    scrollbar-gutter: stable;
+}
 body {
     background: url('/static/single_pages/images/bg_img.jpg') no-repeat center center fixed;
     -webkit-background-size: cover;
