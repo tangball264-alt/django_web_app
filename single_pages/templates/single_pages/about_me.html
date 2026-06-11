@@ -4,43 +4,204 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!--등록 내용이 없는 메타 데이터 입력 태그들은 주석 처리함
     <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Blog Home</title>
+    <meta name="author" content="" />-->
     <!--이 내용은 single_pages/about_me입니다.-->
     <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.min.css'  %}" media="screen"> <!-- 부트스트랩 파일 링크. 원래 수정하라고 요구받았는데, 기존 텍스트 없어 내가 수정. -->
     <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!--<link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    교재에서는 파비콘을 등록하지 않기 때문에 오류를 방지하고자 주석 처리함-->
     <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="css/styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'single_pages/css/about_me.css' %}" media="screen" />
+    <script src="https://kit.fontawesome.com/704ec76331.js" crossorigin="anonymous"></script>
     <title>about me</title>
 </head>
 <body>
         <!-- Responsive navbar-->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" href="#!">BLOG with Django</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="/">Landing</a></li>
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/about_me/">AboutMe</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
+        {% include 'blog/navbar.html' %}
+
+    <section>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1>개발자 고다영입니다.</h1>
+                    <br/>
+                    <p class="lead">
+                        음악과 컴퓨터, 수공예를 좋아합니다.<br/>
+                        취미로는 뜨개질과 가벼운 실내 운동을 즐깁니다.
+                    </p>
+
+                    <ul>
+                        <li>EDUCATION</li>
+                        <ul>
+                            <li>제주대학교 컴퓨터공학 학사 졸업 (2021.3~2025.8)</li>
+                        </ul>
+                        <li>CERTIFICATES</li>
+                        <ul>
+                            <li>정보처리기사 (2025.6.13)</li>
+                            <li>AICE Associate (2026.2.27)</li>
+                        </ul>
+                        <li>SCORE</li>
+                        <ul>
+                            <li>TOEIC : 620점 (2025.12.28)</li>
+                        </ul>
                     </ul>
                 </div>
+                <div class="col-lg-4">
+                    <img class="img_fluid" src="{% static 'single_pages/images/me.png' %}">
+                </div>
             </div>
-        </nav>
+        </div>
+    </section>
 
-    <h1>개발자 고다영입니다.</h1>
-    <h2>이력</h2>
-    <h3>제주대학교 졸업(2025.8)</h3>
-    <h2>활동</h2>
-    <h3>TOPCIT 시험 참여(422/1000점)</h3>
-    <h3>TOPCIT 시험 참여(550/1000점 -상위 30%)</h3>
-    <h3>공무원연금공단 강의 및 견학 프로그램 참여</h3>
-    <h3>정보처리기사 자격증 취득</h3>
-    <h3>Django 블로그 만들기(교재 참고)</h3>
-    <h3>AICE Associate자격증 취득 도전</h3>
+    <section class="bg-light margin-for-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1>PORTFOLIO</h1>
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-lg-3 g-4">
+                <!--카드1-->
+                <div class="col">
+                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#pywebapp">
+                        <!--data-bs-target 값은 첫 번째 모달 id-->
+                        <img class="card-img-top pf-card-img" src="{% static 'single_pages/images/pyweb.png' %}">
+                        <div class="card-body">
+                            <h5 class="card-title">파이썬 웹페이지 개발 [PYWEBAPP]</h5>
+                            <p>Python, Django, Bootstrap으로 웹사이트를 개발하고 개발 과정을 git으로 관리하며 최종적으로 배포하는 과정을 수행하고 있습니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <!--카드2-->
+                <div class="col">
+                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#busapp">
+                        <!--data-bs-target 값은 첫 번째 모달 id-->
+                        <img class="card-img-top pf-card-img" src="{% static 'single_pages/images/pf2.png' %}">
+                        <div class="card-body">
+                            <h5 class="card-title">교내 순환버스 탑승 앱 [BUSAPP]</h5>
+                            <p>교재 순환버스의 노선을 확인하고, 정거장에서 대기 중인 학생이 버스 측으로 승차 요청을 보낼 수 있도록 기획하였습니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <!--카드3-->
+                <div class="col">
+                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#songgame">
+                        <!--data-bs-target 값은 첫 번째 모달 id-->
+                        <img class="card-img-top pf-card-img" src="{% static 'single_pages/images/pf3.png' %}">
+                        <div class="card-body">
+                            <h5 class="card-title">플랫포머 리듬게임</h5>
+                            <p>Unity를 활용하여 PC 플랫포머형 리듬게임 개발 프로젝트를 수행하였습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     
+
+    
+
+    <div class="fixed-bottom">
+        {% include 'blog/footer.html' %}
+    </div>  
+
+
+    <!--MODAL-->
+    <div class="modal fade" id="pywebapp" tabindex="-1" role="dialog" aria-labelledby="pywebappModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="busappModalLabel">파이썬 웹페이지 개발</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <img class="img-fluid" src="{% static 'single_pages/images/project_pywebapp.png' %}">
+                        </div>
+                        <div class="col-lg-5">
+                            <p>Python, Django, Bootstrap으로 웹사이트를 개발하고 개발 과정을 git으로 관리하며 최종적으로 배포하는 과정을 수행하고 있습니다.
+                                    <br/>
+                                    이 과정은 교재 [장고+부트스트랩 파이썬 웹 개발의 정석]을 참고하여 단독으로 진행하였습니다.</p>
+                            <a href="https://github.com/tangball264-alt/django_web_app" target="_blank" rel="noopener noreferrer" class="btn btn-light"><i class="fa-brands fa-github"></i> github</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="busapp" tabindex="-1" role="dialog" aria-labelledby="busappModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="busappModalLabel">교내 순환버스 탑승 앱</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <img class="img-fluid" src="{% static 'single_pages/images/pycon_sy_2017.png' %}">
+                        </div>
+                        <div class="col-lg-5">
+                            <p>P교재 순환버스의 노선을 확인하고, 정거장에서 대기 중인 학생이 버스 측으로 승차 요청을 보낼 수 있도록 기획하였습니다.
+                                <br/>
+                                Flutter를 통해 개발했고, github의 QR코드 생성-촬영 오픈소스를 활용하였습니다. Firebase를 사용하고자 시도하였습니다.
+                                <br/>
+                                대학 캡스톤 강의 중 진행한 프로젝트로, 단독 진행하였으며 미완성으로 종료되었습니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="songgame" tabindex="-1" role="dialog" aria-labelledby="songgameModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="songgameModalLabel">플랫포머형 리듬게임</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <img class="img-fluid" src="{% static 'single_pages/images/project_songgame.jpeg' %}">
+                        </div>
+                        <div class="col-lg-5">
+                            <p>Unity를 활용하여 PC 플랫포머형 리듬게임 개발 프로젝트를 수행하였습니다. 
+                                맵 제작을 맡아 여러 곡에서 단일한 시스템으로 쉽게 맵을 만들 수 있도록 하였습니다.
+                                <br/>
+                                점프 버퍼링 등 당시에는 알지 못했던 편의 시스템을 추가한다면 완성도가 올라갈 것 같습니다.
+                                <br/>
+                                해당 프로젝트는 대학교 재학 중, 캡스톤 강의에서 팀원들과 함께 수행했습니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="{% static 'blog/js/scripts.js' %}"></script>
 </body>
 </html>
+

@@ -1720,3 +1720,124 @@ html {
 이것으로도 동일한 효과가 나오는지 확인
 두 방법간에 출력상 차이는 없다
 그러나 전자는 움직이지 않는'스크롤바'가 생기고, 후자는 '스크롤 바가 될 수 있는 공간'이 여백으로 미리 할당되어있는 상태.
+
+커밋
+
+자기소개 페이지 완성하기
+1. 레이아웃 구성하기(about_me.html 수정)
+2. about_me.css 파일 만들기
+3. 자기소개 내용 추가
+4. 포폴 섹션 내용 추가
+
+## 54일차
+레이아웃 구성
+- 파비콘 및 내용 없는 메타 데이터 입력 태그 주석 처리(다른 html에도 불필요한 부분 주석 처리해야.)
+- bootstrap.min.css파일과 about_me.css파일 링크 연결.
+- 폰트어썸 연결 스크립트 태그 추가.
+- navbar 연결
+- 소개글 섹션(이미지 포함)과 포트폴리오 섹션 구분
+- footer추가
+- 포폴 섹션에 margin-for-footer 추가
+
+about_me.css파일 생성
+- css로 margin-bottom추가.
+
+- 교재 버전은 landing과 about_me모두 푸터에 fixed-bottom을 부여함. -> 하지만 aboutme에서는 blog와 같은 방식이어도 괜찮을 것 같아서 고민된다.
+
+자기소개 내용 추가
+- 기존에 추가해둔 이력 데이터를 자기소개와 포폴로 분리해서 작성해야 함.
+    <h2>이력</h2>
+    <h3>제주대학교 졸업(2025.8)</h3>
+    <h2>활동</h2>
+    <h3>TOPCIT 시험 참여(422/1000점)</h3>
+    <h3>TOPCIT 시험 참여(550/1000점 -상위 30%)</h3>
+    <h3>공무원연금공단 강의 및 견학 프로그램 참여</h3>
+    <h3>정보처리기사 자격증 취득</h3>
+    <h3>Django 블로그 만들기(교재 참고)</h3>
+    <h3>AICE Associate자격증 취득 도전</h3>
+  제대 졸업과 학과 정보는 자기소개에
+  취득 자격증도 여기
+  토익 성적 정도만 간단히.(topcit은 성적받으려 본 게 아니니 빼자.)
+  포폴에서는 내가 진행한 이 프로젝트. + 그 외에 학생 때 진행해본 프로젝트 간략 소개.
+
+## 55일차
+포폴 섹션 카드랑 내용 추가.
+1은 지금 진행중인것
+2는 학교에서 한 버스승차앱
+3은 모바일게임 제작 팀플
+간략하게 적었음.
+
+향후 카드와 이미지의 길이 조절 필요.
+
+다음 단계
+모달 작성.(card의 모달id도 작성.)
+위에 포폴 카드에 작성한 상세 활동 내역도 모달로 이동.
+
+모달 파트는 상세 내용이 교재에 없고 github참고를 권고.
+<div class="modal fade" id="pycon2017" tabindex="-1" role="dialog" aria-labelledby="pycon2017ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pycon2017ModalLabel">파이썬으로 통계업무 자동화하기</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <img class="img-fluid" src="{% static 'single_pages/images/pycon_sy_2017.png' %}">
+                    </div>
+                    <div class="col-lg-5">
+                        <p>Python, Django, Pandas, python-docx로 통계업무 자동화한 내용을 파이콘에서 발표했습니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+따라서 위 코드를 복붙 후 수정할 것.
+
+## 56일차
+위 모달 코드 복붙 후 모달 id 등과 내용 수정.
+추가로 data-dismiss는 현행 버전상 data-bs-dismiss로 수정.
+
+삽입할 이미지 있으면 좋겠음.
+
+일단은 현재 프로젝트만 적당히 캡쳐하고 나머지는 생략.
+
+55일차에 말한 포폴 카드 사이즈 조절 시작.
+AI활용.
+
+문제
+1. 이미지 크기가 제각각임.
+2. 글자 길이도 제각각임.
+
+이를 수정하기 위해서
+1. 이미지들에 pf-card-img 클래스를 부여하고, css파일에서 크기와 배치 등을 조정한다.
+2. card div에 class h-100을 추가.(그리고 col-lg-4대신 col을 쓰고, 대신 그 상위의 row에 div class="row row-cols-1 row-cols-lg-3 g-4">로 전가.)
+
+각 역할 설명.
+1. css에서 각 이미지의 가로와 세로 사이즈를 강제한다. height:200px, width:100%
+2. 또한 사이즈에 맞추어 이미지가 스케일링되도록 한다. object-fit: contain;(cover로 하면 사이즈 맞춰서 이미지 잘림.)
+3. 그리고 이미지를 가운데정렬한다. object-position: center;
+4. html에서 카드의 분할을 부모 row에게 넘김으로써, flexbox매커니즘에 따르게 됨. 높이 동기화 위한 기초 환경 생성.
+5. h-100클래스 추가. 카드 세로 높이는 그 부모인 col을 100% 채운다. 이렇게 하면 카드 세로 길이가 모두 가장 긴 쪽에 맞추어진다.
+-> 이 때, 4에 해당하는 부분을 생략하면 어떻게 될까? : 의외로 정상 작동함. 하지만 ai주장에 따르면 향후 오류의 여지가 있고, 테스트 결과 모바일 사이즈에서 카드간의 상하 간격이 지나치게 붙는 등 시각적 차이가 발생하기 때문에, 생략하지 않고 진행하기로 함.
+
+그 다음
+모달에 github링크 연결.
+원본에서 사용한 형식 찾기
+-> button + 그 안에 icon사용.
+아이콘을 깃헙 아이콘으로 변경. 그리고 링크 연결을 위해 button대신 a태그에 클래스가 btn
+ target="_blank" rel="noopener noreferrer" 을 추가해 '새 탭에서 열기' + target사용시 필요한 '보안 기능'적용
+>공식 문서 정보 : 
+>참고 : target을 사용할 때, rel="noreferrer"를 추가해 window.opener API의 악의적인 사용을 방지하는걸 고려하세요.
+>참고 : 최근의 브라우저(Firefox 79+ 등)에서는 target="_blank"를 지정하면 rel="noopener"를 적용한 것과 같은 동작을 합니다.
+
+링크 연결 정상 진행을 확인하고, 저장소를 공개로 전환하여 실제 연결 성공.
+
+

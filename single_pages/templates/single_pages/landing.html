@@ -21,33 +21,34 @@
 
         <!-- Responsive navbar-->
         {% include 'blog/navbar.html' %}
-    <div class="container">
-        <div class="row justify-content-between">
-            <div class="col-lg-6 text-light">
-                <h1 class="mt-5">Do It Django</h1>
-                <p>파이썬 진영의 가장 대표적인 웹프레임워크 중 하나인 django를 이용하여 나만의 블로그 사이트 만들기</p>
-                <p>참고 : 장고+부트스트랩 파이썬 웹 개발의 정석(이성용, 김태곤 지음. 이지스퍼블리싱)</p>
-            </div>
-            <div class="col-lg-5 mt-5">
-                <h2 class="text-light">Blog - 최근 게시글</h2>
-                {% for post in recent_posts %}
-                    <div class="card mt-1">
-                        <div class="card-body">
-                            <h6><a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark fw-bold">{{ post.title }}</a></h6>
-                        
-                            <span class="badge rounded-pill bg-light text-dark float-end">
-                                <img class="me-1 rounded-circle" src="{{ post.get_avatar_url }}" alt="{{post.author}}" width="20px">
-                                {{ post.author.username }}
-                                &nbsp;&nbsp;
-                                {{ post.created_at }}
-                            </span>
-                        </div>
-                    </div>               
-                {% endfor %}
+    <section>
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-lg-6 text-light">
+                    <h1 class="mt-5">Do It Django</h1>
+                    <p>파이썬 진영의 가장 대표적인 웹프레임워크 중 하나인 django를 이용하여 나만의 블로그 사이트 만들기</p>
+                    <p>참고 : 장고+부트스트랩 파이썬 웹 개발의 정석(이성용, 김태곤 지음. 이지스퍼블리싱)</p>
+                </div>
+                <div class="col-lg-5 mt-5">
+                    <h2 class="text-light">Blog - 최근 게시글</h2>
+                    {% for post in recent_posts %}
+                        <div class="card mt-1">
+                            <div class="card-body">
+                                <h6><a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark fw-bold">{{ post.title }}</a></h6>
+                            
+                                <span class="badge rounded-pill bg-light text-dark float-end">
+                                    <img class="me-1 rounded-circle" src="{{ post.get_avatar_url }}" alt="{{post.author}}" width="20px">
+                                    {{ post.author.username }}
+                                    &nbsp;&nbsp;
+                                    {{ post.created_at }}
+                                </span>
+                            </div>
+                        </div>               
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
-
+    </section>
 
     <div class="bg-image-credit">
         본 저작물은 공공누리 제 1유형에 따라 제주콘텐츠진흥원(https://www.ofjeju.kr/, 2024년 촬영)에서 작성한 저작물을 이용하였습니다.
