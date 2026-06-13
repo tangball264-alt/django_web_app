@@ -1840,4 +1840,74 @@ AI활용.
 
 링크 연결 정상 진행을 확인하고, 저장소를 공개로 전환하여 실제 연결 성공.
 
+커밋
 
+
+다음 단계는 배포.
+배포하는 방법
+1. 가상화 사용 여부 확인
+가상화개론 했던 노트북이니 당연히 가능할 것.
+맥북은 윈도우와 달리 가상화 기능이 상시 on이고 끌 수 없다고 함.
+2. 도커 사용
+재학 중 다운받은 도커 도로 삭제했었음. 재설치
+가상환경에서도 도커가 정상적으로 인식됨.
+
+이제 도커를 이용해보자. -> 내 파일들을 도커로 이사시키자!
+1. 모듈 리스트 만들기
+- 지금 가상환경에 설치해둔 라이브러리들을 도커로 옮겨야 함.
+- 그러니 뭐뭐 옮겨야 하는지 리스트(=모듈 리스트)를 만들 것
+- 방법 : pip freeze > requirements.txt
+- pip freeze하면 출력되는 현재 설치된 라이브러리 이름과 그 버전 리스트를 지정한 txt파일에(없으면 만들어서) 적는다(cat)
+- 이거 그대로 하면 현재 위치(django_web_app파일)에 이 txt파일 생성됨.
+2. 도커 설정 파일 만들기
+- 지금까지 프로젝트 진행해온 로컬 환경과 동일한 컨테이너 이미지를 만들기 위하여 '도커에도 똑같이 적용할 환경설정' 기록물 정도.
+- 파일명은 기본적으로 'Dockerfile'로 약속됨.(확장자 없음)
+- 이를 프로젝트 폴터에 생성하고 지정된 내용을 작성.
+- 지정된 내용 중 파이썬 버전에 대해서는 교재가 아닌 내 환경에 맞출 것.
+- 내용 : 필요한 도커 이미지 불러오기(파이썬 설치됨) / 작업폴더 지정 / 파이썬 설정들 변경사항 / 모듈 리스트 설치하려면 필요한 거 설치 / 내 작업물 작업폴더로 옮기기 / 모듈리스트의 라이브러리 설치
+3. 도커 컴포즈 파일 만들기
+- 컨테이너 여러개를 한 번에 실행시키거나, 컨테이너 실행 시 옵션을 주는 등의 기능을 할 수 있음.
+- 기본 파일명 : docker-compose.yml
+- 일단은 간단하게 '실행'정도만.
+- 내용 : 버전(현재는 생략가능) / 배포할 서비스는 : 서비스이름 : 빌드할 폴더/실행할 커맨드/로컬-도커 폴더 연결/사용포트/환경파일
+4. settings.py 수정하고 개발환경 파일(.env.dev) 작성하기
+- 기존 보안키(django가 기본 제공한 안전하지 않은(insecure) 보안키. 
+- settings수정하고 .env.dev 만들어서 작성.
+5. docker-compose build 명령어 실행.
+- 실패. AI 주장으로는 '최신 버전에서 docker-compose 대신 docker compose ...로 바뀌었다.'
+- https://docs.docker.com/compose/intro/history/
+- https://docs.docker.com/compose/intro/compose-application-model/
+- 컴포즈 파일 명칭도 compose.yml로 권장사항이 변경되었지만 기존 것도 사용가능.
+- 나는 기존 것 유지.
+- docker compose build 로 실행됨.
+- 오류 : failed to solve: process "/bin/sh -c apk add postgresql-dev gcc python3-dev musl-dev slib-dev jpeg-dev" did not complete successfully: exit code: 1
+- 도커 파일 중 해당 줄 오탈자로 오류 발생(slib->zlib수정함). 오타 수정해고 재시도.
+- 완료됨
+- docker compose up 실행.
+- 정상 실행 확인. 127.0.0.1에서 접속 가능하고, control+c로 종료도 가능.
+- 터미널로 docker compose up -d 입력해서 백그라운드에서 돌리기. 로그 안보여주지만 웹사이트는 정상 작동할 것.
+
+## 57일차
+
+터미널 키워드
+>docker compose build : 이미지 만들기
+>
+>docker compose up : 컨테이너 실행
+>
+>docker compose up -d : 컨테이너 실행(백그라운드). 
+>
+>docker image ls : 도커 이미지 목록 보기
+>
+>docker container ls : 도커 컨테이너(실행중) 목록 보기
+>
+>docker compose exec web python manage.py test : web컨테이너에서 python manage.py test 명령을 실행
+>
+>docker compose down : 실행중인 컨테이너 종료
+
+docker image ls하자 총 5개 이미지 확인. django_web_app-web 빼고는 기본 제공되는 관리용 이미지임.
+container ls에서 django_web_app-web-1 컨테이너 확인.
+테스트 명령 실행 : ok. 이게 컨테이너 실행중에만 가능한 명령인듯(컨테이너 이름도 필요하니까.)
+down : 컨테이너 종료됨.
+이후 container ls에서는 컨테이너 없음. image ls에서는 여전히 이미지 존재. 위의 '테스트 명령'에서는 service "web" is not running 으로 실패하는 것이 정상적으로 확인됨.
+
+커밋
