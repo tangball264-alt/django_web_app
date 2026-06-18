@@ -1911,3 +1911,92 @@ down : 컨테이너 종료됨.
 이후 container ls에서는 컨테이너 없음. image ls에서는 여전히 이미지 존재. 위의 '테스트 명령'에서는 service "web" is not running 으로 실패하는 것이 정상적으로 확인됨.
 
 커밋
+
+DB(PostgreSQL)사용하기
+기존에는 장고 기본제공인 db.sqlite3 사용 -> 프로젝트 규모 확장 or 웹사이트 방문자 증가에 따라 성능 저하 위험.
+오픈 소스로 활용 가능한 PostgreSQL 사용 권장.
+
+사용법(도커 없을시)
+1. 로컬 컴퓨터(내 맥북)에 PostgreSQL 설치
+2. 서버에서 다시 설치/설정 작업
+-> 그러나 도커 사용시 매우 단순화됨.
+
+사용 설정 방법
+1. compose파일 수정.
+> depends_on 항목에 db 넣고, web과 나란히 db서비스를 추가.
+
+## 58일차
+
+db 적용 이어서.
+지난번에 compose파일 수정 마쳤으니 settings.py와 .env.dev 수정.
+
+settings.py
+```
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+```
+이 부분에 디폴트 안쪽 내용을 대대적으로 수정.
+엔진, 이름, 유저, 암호, 호스트, 포트 총 6줄.
+전부 os.environ.get이용할 것.
+기존에 있던 것도 활용하되 os.environ.get을 이용하네.
+이 부분의 의미는 별도로 알아보면 좋을듯.
+
+그리고.env.dev파일 업데이트. 위에서 지정한 SQL_이하생략 각각 지정해주기. 채우는 내용은 settings.py와compose파일의 것들로.
+
+빌드=실행.
+결과 : ERR_CONNECTION_RESET
+교재에서 말한 페이지가 작동하지 않습니다랑 같은건가?
+
+오류 찾아보기
+db-1  | 2026-06-18 07:05:58.597 UTC [1] LOG:  database system is ready to accept connections
+>따라서 db-1은 문제없이 작동.
+web-1  | django.core.exceptions.ImproperlyConfigured: Error loading psycopg2 or psycopg module
+>psycopg2혹은 psycopg모듈을 로딩하는 부분에서 오류 발생.
+
+따라서 교재와 같은 오류고 같은 방식으로 해소할 수 있음을 확인
+psycopg검색해보기
+>The most popular PostgreSQL adapter for Python
+>
+>A complete implementation of the Python DB API 2.0 specification, built on top of the official PostgreSQL client library, with many extensions giving access to the full power of modern Python and PostgreSQL.
+
+교재와 같이 pycopg2로 설치. 현재 가상환경에 pip install psycopg2
+그리고 requirements.txt에 설치 결과를 반영.
+
+다시 빌드-실행.
+결과는 오류(programming error)나와야 정상이다.
+실행 후 ProgrammingError at / 확인. 정상적으로 실패했다.
+
+오류 원인 : 데이터베이스 테이블 없음
+데이터베이스를 변경하고서 마이그레이션을 한 번도 하지 않아 DB테이블이 생성되지 않은 상태
+따라서 web컨테이너에 접속하여 마이그레이션 한다.
+
+터미널1
+>docker compose up
+터미널2(새로 튼다.)
+>source venv/bin/activate (가상환경 실행)
+>django_web_app % docker compose exec web python manage.py migrate
+도커로 만든 web컨테이너에 접속해 python manage.py migrate를 실행.
+
+기존 테스트용 포스트가 다 날아갔음.
+관리자 계정과 기타 계정들도 존재하지 않게 됨.
+
+새 관리자 계정 만들기
+>docker compose exec web python manage.py createsuperuser
+>james
+>james@doitdjango.com
+>비번은 이전과 같이
+
+왜 로그인 시 email로 로그인만 뜨지?
+구글로 로그인이 같이 떠야 하는데?
+
+일단 테스트 결과
+1. blog에서 로그인 가능. 단, modal에서 구글로 로그인/sign in버튼 사라짐.
+2. blog에서 포스트 작성 및 댓글 작성 가능.
+3. admin에서 포스트 작성 가능. view on site 연결 안됨.
+4. site를 example.com에서 127.0.0.1:8000으로 수정한 후 연결됨.
+5. 컨테이너 껐다 켜도 데이터 유지됨.
+6. 그러나, 여전히 구글로그인 기능 적용 안됨.
