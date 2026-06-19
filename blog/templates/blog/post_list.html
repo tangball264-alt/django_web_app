@@ -80,7 +80,7 @@
                     <h2 class="card-title">{{ p.title }}</h2>
                     <div class="card-text">{{ p.get_content_markdown | truncatewords_html:15 | safe }}</div>
                     {% if p.tags.exists %}
-                        <i class="fa-regular fa-tags" style="color: #74C0FC;"></i>
+                        <i class="fa-solid fa-tags" style="color: #74C0FC;"></i>
                         {% for tag in p.tags.iterator %}
                             <a href="{{ tag.get_absolute_url }}"><span class="badge text-bg-secondary">{{tag}}</span></a>
                         {% endfor %}

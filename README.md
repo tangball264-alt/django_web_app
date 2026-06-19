@@ -2000,3 +2000,36 @@ psycopg검색해보기
 4. site를 example.com에서 127.0.0.1:8000으로 수정한 후 연결됨.
 5. 컨테이너 껐다 켜도 데이터 유지됨.
 6. 그러나, 여전히 구글로그인 기능 적용 안됨.
+
+## 59일차
+
+장고 명령어 runserver대신 전문적인 웹 서버 소프트웨어를 이용해 웹 사이트를 실행하기.
+
+즉, nginx 사용
++ 장고와 nginx연결을 위해 gunicorn사용
+
+
+1. 컴포즈 파일 command 변경 -> gunicorn으로
+```
+gunicorn do_it_django_prj.wsgi:application --bind 0.0.0.0:8000
+```
+2. pip로 gunicorn설치 + requirements 업데이트 + 이미지 빌드(와 실행까지 연속으로)
+- 실제 빌드+실행결과 작동 안함.
+- 사유는 do_it_django_prj라는 모듈이 없기 때문에.
+- 이 모듈명이 settings에 있는 것으로 확인됨.(github에서 이 교재 파일 찾음)
+- WSGI_APPLICATION = "django_web_app.wsgi.application"
+- 따라서 나는 django_web_app.wsgi:application을 사용.
+- 결과 : 
+  1. 이미지 파일 로딩 안됨(단, blog-post_list에서 최신 포스트에 제공한 무작위 이미지 제외)
+  2. 일부 아이콘 로딩 안됨(예를 들어, 태그 아이콘 중 하나는 로딩되고 하나는 안됨.)->이건 최신 포스트와 그 외 포스트 카드 양식에서 사용한 태그 아이콘이 달라서 생긴 문제로 추정. 통일함.
+  3. 일부 css설정 적용 안됨.(ex, 싱글 페이지의 fixed되고 margin주어진 footer부분이 기능 적용 안되어서 포트폴리오 카드 일부를 가리는 등)
+  4. 교재와 달리 일부는 적용됨(bootstrap 쪽 css는 정상 적용된듯?)
+3. settings.py의 STATIC_ROOT경로 지정.(STATIC_ROOT = os.path.join(BASE_DIR, '_static'))
+4. urls.py에서도 이것이 처리되도록 urlpatterns 추가문을 작성.(
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))
+5. 명령어 python manage.py collectstatic으로 스태틱 파일을 복사함.(신규 static폴더 생성해서 거기에 모든 스태틱 복사)
+6. 새로 빌드.
+- 정상적으로 로딩되는 것 확인함.
+- 단, 일부 aboutme이미지 등 재업 시 어떻게 처리될지 알 수 없다.
+
+그리고 github에 커밋

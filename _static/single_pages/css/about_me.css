@@ -1,0 +1,10 @@
+.margin-for-footer {
+    margin-bottom:130px;
+}
+/* 포트폴리오 카드 상단 이미지 크기 및 비율 고정 클래스 */
+.pf-card-img {
+    height: 200px;
+    width: 100%;
+    object-fit: contain;       /* 이미지가 잘리지 않도록 영역 내에 맞춤 */
+    object-position: center;
+}

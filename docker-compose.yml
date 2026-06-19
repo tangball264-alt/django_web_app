@@ -4,7 +4,7 @@ version: '3' #도커 컴포즈 파일 포맷을 최신 버전(3)으로 사용하
 services:
   web: #실행할 서비스는 'web'(이름잉) 하나만.
     build: . #현재 폴더를 build할 것.
-    command: python manage.py runserver 0.0.0.0:8000 #터미널에서 입력하던 서버 실행 command 입력. 그리고 주소는 로컬인 127.0.0.1 대신 외부 통신도 받는 0.0.0.0에 포트는 8000 유지.
+    command: gunicorn django_web_app.wsgi:application --bind 0.0.0.0:8000 #python manage.py runserver대신 gunicorn을 사용해 실행하는 명령어. 그리고 주소는 로컬인 127.0.0.1 대신 외부 통신도 받는 0.0.0.0에 포트는 8000 유지.
     volumes: #로컬 컴퓨터의 폴더와 도커의 폴더를 연결. 여기서는 현재 폴더 ./와 도커의 workdir /usr/src/app/을 연결.
      - ./:/usr/src/app/
     ports: # 내 컴퓨터 포트 8000 : 컨테이너 내부 포트 8000 사용
