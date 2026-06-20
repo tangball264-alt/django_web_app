@@ -2033,3 +2033,64 @@ urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))
 - 단, 일부 aboutme이미지 등 재업 시 어떻게 처리될지 알 수 없다.
 
 그리고 github에 커밋
+
+## 60일차
+배포용 도커 파일 만들기
+
+**실제 웹 사이트를 공개할 때 보안을 위해 일부 수정.**
+1. 도커 컴포즈 파일 개발용과 배포용으로 분리.
+- docker-compose.dev.yml로 복사.
+- 기존 파일은 배포용. 복사한 dev는 개발용.
+- 이 이름 규칙에 대해 모르겠어.
+2. 개발용 파일로 실행하는 명령어
+> docker compose -f docker-compose.dev.yml up
+- 당연하지만 배포용 실행은 이전과 같은 기본 명령어.
+3. 배포용 파일 수정하기
+- web의 env_file을 ./.env.*dev*에서 ./.env.*prod*로 수정.
+- db의 environment 항목과 그 안의 전문을 삭제. 대신 env_file항목을 추가하여 *./.env.prod.db* 작성.
+- 개발용 환경설정 파일(.env.dev)대신 배포용 파일을 사용하겠다는 의미(곧 파일 생성할것)
+- 또한 postgresql관련 내용(비밀번호, 유저, 기타등등)을 컴포즈 파일이 아닌 .env.prod.db파일에서 별도로 관리(이것도 만들어야 함)
+4. 환경설정 파일인 .env.dev를 복사해 .env.prod파일을 만들고 내용을 수정.
+- debug를 0으로 변경해 자세한 오류메시지 출력을 중단. 공격자들에게 힌트가 될 수 있기 때문에.
+- 시크릿 키는 get_random_secret_key()함수로 새 키를 생성하여 입력.
+  기존의 django insecure 키 대신 python manage.py shell로 여는 장고 셀에서 위 함수로 키를 만든다.
+  이 때, 셀에서 from django.core.management.utils import get_random_secret_key로 임포트 먼저 해야함.
+- db의 이름, 유저 이름, pw 등을 변경(유저 이름과 패스워드는 실사용을 위해 직접 정할것.)
+5. .env.prod.db를 만들어서 postgres user, pw, db를 작성(아까 compose에서 지운 environment 항목들. 각 값을 .env.prod에 맞추어 수정.)
+6. .env.prod와 .env.prod.db를 gitignore에 추가.
+
+이제 기존 컨테이너를 끄고, 이 컨테이너들과 연결되어 있던 볼륨도 모두 삭제
+나는 컨테이너 끈 상태지만 볼륨 삭제의 필요성을 느껴서 그대로 수행
+>docker compose down -v
+-v 옵션으로 볼륨도 삭제하는 것.
+
+그리고 up -d로 배포용 컨테이너 실행.
+사유 불명의 오류.
+하지만 교재는 sever error (500)으로 나오고 나는
+사이트에 연결할 수 없음
+127.0.0.1에서 연결을 거부했습니다. 으로 나온다.
+
+**문제 발생시 방법**
+>docker compose logs
+
+이거 출력이 다른게 오류가 교재랑 다른 거 같아.
+
+오류 원인 확인
+사유 : .env.prod.db 편하게 쓰려고 복붙했다가 앞의 '- '안지우고 써서.
+원래 POSTGRES...부터 바로 들어가야 함.
+오류 원인 2
+사유 : compose파일 수정하다가 web의 env_file이름 잘못씀.
+
+
+정상적으로 server error(500) 확인
+
+docker compose logs : 
+db-1   | 2026-06-20 05:56:55.605 UTC [61] ERROR:  relation "blog_post" does not exist at character 35
+
+전체 중 마지막 아래 두번째 줄
+에러 확인 가능.
+아마 볼륨 지우고 나서 새로 마이그레이션 요구하는 듯.
+migrate 하고 새 최고관리자 계정 만들기.(따로 빌드는 x)
+
+접속과 어드민 접속 확인했지만 다시 이미지 파일 적용 안되고 아예 css도 적용 안되는 문제.
+앞부분과 같은 문제일 가능성 높아서 확인.
