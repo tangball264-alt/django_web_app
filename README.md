@@ -2205,3 +2205,85 @@ aws 콘솔 접속 성공.
 2. 데이터 옮기기
 > 인스턴스 생성되고 실행중일때 터미널에서 지금까지 내용 깃허브로부터 클론.
 그 전에 현재 readme 저장.
+
+3. 가상서버에 도커 설치
+현재 버전 우분투이기때문에(24.04 lts) 명령어 수정 필요.
+따라서 교재 내 것을 그대로 사용하는 대신 https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository 페이지가 제공하는 내용을 따라감.(enable설정만 추가로)
+컴포즈 설치도 동일.
+그 후 재부팅
+
+
+**도커로 서비스 시작하기**
+1. 고정 ip 생성
+> 들어가 있던 인스턴스 화면을 나와서 네트워킹 탭으로 들어가면 보이는 기능.
+> 생성
+2. 배포용 환경설정 파일 만들기
+> .env.prod파일과 .env.prod.db파일은 gitignore파일이라 aws서버에는 clone되지 않음. 따라서 새로 생성.
+> 지정 명령어를 서버 터미널에 입력.
+> nano로 .env.prod파일을 편집해 로컬의 .env.prod내용 복붙하기
+> 동시에 django_allowed_hosts에 인스턴스의 고정 ip를 추가로 삽입
+> user와 pw를 수정하면 되는데, 나는 간단하게 내 아이디랑 아이디_pw로 수정하기로.
+> 그리고  마지막에 DATABASE = postgres 를 추가.(이거에 대해 교재의 말이 없는데 이전에 작성한 기억이 없으니 그냥 씀.)
+3. 컨테이너 실행
+> sudo docker compose up -d --build
+> 빌드하는데 엄청 걸리는 거 같음. 중간에서 멈춰서 추가 반응이 없어.
+> 다음 거 아직 입력 못함.
+
+## 64일차
+도중에 멈추거나 하는 문제로 migrate단계 수행 실패.
+
+web 로그를 보아 메모리 부족 문제.
+
+AI 조언을 받아 스왑 파일을 생성하는 방식으로 문제를 해결. 정상 작동 확인됨.
+til에 스왑 파일에 대해 작성할 것.
+
+메모리 문제는 해결했으나, 고정 ip로 접근하는 데 실패. 문제 2가지 발견
+1. .env.prod 의 allowed host 항목에 문제 발생. 오탈자(licalhost)와 =좌우 불필요한 공백들 제거.
+2. 여전히 안됨. 로그 확인 후 showmigrations하자 비정상적 x발생 migration과정에서 튕기면서 오류 생긴 것으로 추정. blog부분이 문제라고 하니 blog만 지목해서 다시 makemigrations, migrate. 
+
+이후 정상적으로 접속 성공. 현재 해당 페이지로 들어갈 수 있음.
+로그인과 포스트 작성이 정상 기능하는지 확인하기.
+
+## 65일차
+도메인 연결 단계.
+
+이전에 고정ip접속까지는 성공.
+다른 기기에서도 접속됨.
+그렇다면, 도메인 주소를 통해서 접근이 가능하게 하려면?
+
++ 그리고 아직 포스트 없고 로그인도 안됨. 수퍼유저 만들고 사이트 설정 조정하고 그 후에 로그인 확인과 구글계정 로그인을 확인해야 함.
+
+교재는 Amazone Route 53추천.
+cloudflare등에서 무료로 이용도 가능하다고 함.
+
+## 66일차
+aws lightsail에서 고정 ip주소 복사
+cloudflare에서 dns 레코드 찾기 -> 레코드 추가 -> tinn-do.com(기본, 즉 @) 추가. ipv4로 복사한 주소 넣기.
+-> 레코드 추가. www.tinn-do.com(즉, www) 추가. ipv4로 복사한 주소 넣기.
+
+즉시 접속을 시도해보니 400 bad request. 그리고 로딩 돌다 타임아웃
+ip주소로는 정상 접속되니 서버는 정상.
+
+등록 도메인 전파까지 기다려야 하나?
+
+-> 교재에서 말하길 서버 쪽에서도 환경 파일 수정하새 도메인 연결해야 함.
+
+1. 서버 터미널 열기. 그리고 프로젝트 파일로.
+2. 나노 .env.prod
+3. allowed hosts 수정(등록한 두 도메인 추가)
+4. 컨트롤+o, ctrl+x
+
+완료하고 시도하였으나 여전히 타임아웃 발생.
+브라우저와 클라우드플레어는 정상적으로 작동했지만 호스트(서버?)가 에러. tinn-do.com이라는 호스트에서 에러.
+
+거기서 나온 말
+
+If you're the owner of this website:
+Contact your hosting provider letting them know your web server is not completing requests. An Error 522 means that the request was able to connect to your web server, but that the request didn't finish. The most likely cause is that something on your server is hogging resources. [Additional troubleshooting information here.](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-522/)
+
+
+아.
+도커 컴포즈 다운 후 빌드부터 해야함. 생각해보니 환경 파일을 수정했으니 다시 해야 하는게 정상인데 맘이 급했다.
+
+
+다시 빌드&업 하니까 정상적으로 연결됨.
