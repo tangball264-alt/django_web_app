@@ -2283,7 +2283,85 @@ Contact your hosting provider letting them know your web server is not completin
 
 
 아.
-도커 컴포즈 다운 후 빌드부터 해야함. 생각해보니 환경 파일을 수정했으니 다시 해야 하는게 정상인데 맘이 급했다.
+도커 컴포즈 다운 후 업 해야함. 생각해보니 환경 파일을 수정했으니 다시 해야 하는게 정상인데 맘이 급했다.
 
 
-다시 빌드&업 하니까 정상적으로 연결됨.
+다시 빌업 하니까 정상적으로 연결됨.
+
+다음 단계는 https 인증.
+
+## 67일차
+https 사용법
+
+**인증기관에서 ssl인증서를 발급받는다.**
+
+단, 보통 유료.
+
+[Let's Encrypt사이트](https://letsencrypt.org/ko/)가 무료 제공.(공익법인이 운영)
+-> 실제 깃헙에서도 사용
+
+단점 : 유효기간 3개월. 발급 과정 번거로움.
+-> Certbot 이용하여 발급과 갱신 과정을 간편하게
+
+기존 배포용 compose파일을 복사하여 compose파일 새로 생성.
+그리고 수정한다.
+
+1. nginx컨테이너
+ - 볼륨에 ./data/certbot/conf:/etc/letsencrypt 추가.
+ - ./data/certbot/www:/var/www/cerbot 도 추가
+ - 포트번호에 443:443 추가
+2. certbot 컨테이너 추가
+ - image: certbot/certbot
+ - entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+ - 볼륨에 nginx에 추가했던 두개 그대로
+
+ 그리고 nginx.conf수정.
+
+                        
+upstream do_it_django {
+    server web:8000;
+}
+
+server {
+    listen 80;
+    server_name tinn-do.com;
+
+    location / {
+        return 301 https://$host$request_uri;
+    } 
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+}
+
+
+server {
+    listen 443 ssl;
+    server_name tinn-do.com;
+
+    location / {
+        proxy_pass http://do_it_django;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+
+    location /static/ {
+        alias /usr/src/app/_static/;
+    }
+
+    location /media/ {
+        alias /usr/src/app/_media/;
+    }
+
+    ssl_certificate /etc/letsencrypt/live/tinn-do.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/tinn-do.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+
+다음으로 init-letsencrypt 다운
+
+curl -L https://raw.githubusercontent.com/wmnnd/nginx-certbot/master/init-letsencrypt.sh > init-letsencrypt.sh
