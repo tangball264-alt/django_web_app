@@ -2365,3 +2365,10 @@ server {
 다음으로 init-letsencrypt 다운
 
 curl -L https://raw.githubusercontent.com/wmnnd/nginx-certbot/master/init-letsencrypt.sh > init-letsencrypt.sh
+
+오탈자로 재시도 많이함......
+
+저장 후 서버에서 풀
+
+sh파일에서는 docker-compose라고 적혀 있어서 문제 발생. 나는 이 라이브러리가 아니라 docker compose 를 쓰는 버전임.
+따라서 해당 내용 수정 후 재업+다시 pull
