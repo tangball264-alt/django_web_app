@@ -86,7 +86,7 @@ django_web_app (Root)
 │   └── views.py           # 최신글 연동 및 정적 페이지 렌더링 뷰
 ├── docker-compose.yml     # 멀티 컨테이너 오케스트레이션 설정 파일
 ├── Dockerfile             # Django 웹 애플리케이션 컨테이너 빌드 파일
-├── init-letsencrypt.sh    # Let's Encrypt SSL 인증서 자동 발급 스크립트
+├── init-letsencrypt.sh    # Let's Encrypt SSL 인증서 최초 발급 스크립트
 ├── manage.py              # Django 명령행 유틸리티
 └── requirements.txt       # 의존성 패키지 목록 파일
 
@@ -141,21 +141,32 @@ python manage.py runserver
 
 ## 🚀 운영 서버 배포 환경 설정 (Production Deployment)
 
-본 프로젝트는 운영 배포 단계에서 인프라의 안정성, 보안 및 데이터 격리를 위하여 **AWS Lightsail 가상 서버** 내에 **Docker 컨테이너 기반 인프라**를 통합 운용합니다.
+본 프로젝트는 운영 배포 단계에서 인프라의 안정성, 보안 및 데이터 격리를 위하여 **AWS Lightsail 가상 서버** 내에 **Docker 멀티 컨테이너 아키텍처**를 구동하여 인프라를 운용합니다.
 
 ### 1. 환경 변수 기반 데이터베이스 분리 (`settings.py`)
 
 배포 환경에서는 주입되는 환경 변수(`SQL_ENGINE` 등)에 맞춰 대용량 데이터 적재에 유리한 `PostgreSQL` 데이터베이스 엔진으로 자동 연결되도록 인프라 파이프라인이 안전하게 구성되어 있습니다.
 
-### 2. 멀티 컨테이너 구조
+### 2. 멀티 컨테이너 구조 및 무중단 인증서 자동 갱신 설정
 
-Docker Compose 아케스트레이션에 의해 총 3개의 격리된 컨테이너가 가상 네트워크로 통신합니다.
+`docker-compose.yml` 오케스트레이션에 의해 격리된 환경에서 안전하게 상호 통신합니다.
 
 * **Web 컨테이너:** Django (Gunicorn WSGI 서버 탑재)
 * **DB 컨테이너:** PostgreSQL (데이터 볼륨 영속성 적용)
-* **Nginx 컨테이너:** Reverse Proxy 서버 (HTTPS 보안 프록시 제어, 외부 정적/미디어 루트 라우팅 및 Certbot SSL 인증서 발급 연동)
+* **Nginx 컨테이너:** Reverse Proxy 서버 (HTTPS 프록시 통신 및 외부 정적 콘텐츠 서빙)
+* **Certbot 컨테이너:** Let's Encrypt 백그라운드 갱신 자동화 프로세스 탑재
+* **Image:** `certbot/certbot`
+* **자동화 로직:** 무한 루프 셸 스크립트를 주입하여 **12시간 주기로 인증서 만료 여부를 체크하고 자동으로 안전하게 갱신**하도록 영속화 프로세스를 최적화했습니다.
+```yaml
+entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
-### 3. 운영 환경 배포 구동 명령어
+```
+
+
+
+
+
+### 3. 운영 환경 최초 배포 및 구동 명령어
 
 AWS Lightsail 방화벽 인바운드 규칙에서 **80(HTTP)** 및 **443(HTTPS)** 포트가 개방되어 있는지 확인한 뒤 서버 인스턴스 터미널에서 다음 명령을 실행합니다.
 
@@ -163,13 +174,14 @@ AWS Lightsail 방화벽 인바운드 규칙에서 **80(HTTP)** 및 **443(HTTPS)*
 # 1. 원격 저장소로부터 배포 빌드 소스 pull
 git pull origin main
 
-# 2. Nginx 컨테이너 이미지 독립 빌드
+# 2. Nginx 웹 서버 컨테이너 이미지 독립 빌드
 sudo docker compose build nginx
 
-# 3. 자동화 SSL 인증서 발급 및 갱신 스크립트 실행
+# 3. 최초 Let's Encrypt SSL 인증서 환경 설정 및 발급 스크립트 실행
 sudo ./init-letsencrypt.sh
 
-# 4. 프로덕션 멀티 컨테이너 서비스 백그라운드 빌드 및 전체 실행
+# 4. 전체 서비스(Django, DB, Nginx, Certbot) 컨테이너 백그라운드 빌드 및 영속 실행
+# (이후 SSL 인증서 갱신은 Certbot 컨테이너에 의해 내부적으로 무중단 자동 처리됩니다.)
 sudo docker compose up -d --build
 
 ```
