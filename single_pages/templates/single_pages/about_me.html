@@ -23,8 +23,8 @@
 
     <section>
         <div class="container mt-4">
-            <div class="row">
-                <div class="col-lg-8">
+            <div class="row align-items-center"">
+                <div class="col-12 col-md-7 col-lg-8 mb-4 mb-md-0">
                     <h1>개발자 고다영입니다.</h1>
                     <br/>
                     <p class="lead">
@@ -48,9 +48,10 @@
                         </ul>
                     </ul>
                 </div>
-                <div class="col-lg-4">
-                    <img class="img_fluid" src="{% static 'single_pages/images/me_suit.jpeg' %}">
+                <div class="col-12 col-md-5 col-lg-4 text-center px-4">
+                    <img class="img-fluid rounded mx-auto" src="{% static 'single_pages/images/me_suit.jpeg' %}" style="width: 100%; height: auto;" alt="개발자 프로필 사진">
                 </div>
+                
             </div>
         </div>
     </section>
@@ -120,11 +121,11 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-lg-7">
-                            <img class="img-fluid" src="{% static 'single_pages/images/project_pywebapp.png' %}">
+                    <div class="modal-dynamic-grid">
+                        <div class="modal-img-container landscape">
+                            <img class="img-fluid modal-pf-img" src="{% static 'single_pages/images/project_pywebapp.png' %}">
                         </div>
-                        <div class="col-lg-5">
+                        <div class="modal-text-box">
                             <p>Python, Django, Bootstrap으로 웹사이트를 개발하고 개발 과정을 git으로 관리하며 최종적으로 배포하는 과정을 수행하고 있습니다.
                                     <br/>
                                     이 과정은 교재 [장고+부트스트랩 파이썬 웹 개발의 정석]을 참고하여 단독으로 진행하였습니다.</p>
@@ -148,11 +149,11 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-lg-7">
-                            <img class="img-fluid" src="{% static 'single_pages/images/project_busapp.png' %}">
+                    <div class="modal-dynamic-grid">
+                        <div class="modal-img-container portrait">
+                            <img class="img-fluid modal-pf-img" src="{% static 'single_pages/images/project_busapp.png' %}">
                         </div>
-                        <div class="col-lg-5">
+                        <div class="modal-text-box">
                             <p>P교재 순환버스의 노선을 확인하고, 정거장에서 대기 중인 학생이 버스 측으로 승차 요청을 보낼 수 있도록 기획하였습니다.
                                 <br/>
                                 Flutter를 통해 개발했고, github의 QR코드 생성-촬영 오픈소스를 활용하였습니다. Firebase를 사용하고자 시도하였습니다.
@@ -177,11 +178,11 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-lg-7">
-                            <img class="img-fluid" src="{% static 'single_pages/images/project_game.png' %}">
+                    <div class="modal-dynamic-grid">
+                        <div class="modal-img-container landscape">
+                            <img class="img-fluid modal-pf-img" src="{% static 'single_pages/images/project_game.png' %}">
                         </div>
-                        <div class="col-lg-5">
+                        <div class="modal-text-box">
                             <p>Unity를 활용하여 PC 플랫포머형 리듬게임 개발 프로젝트를 수행하였습니다. 
                                 맵 제작을 맡아 여러 곡에서 단일한 시스템으로 쉽게 맵을 만들 수 있도록 하였습니다.
                                 <br/>

@@ -8,3 +8,70 @@
     object-fit: contain;       /* 이미지가 잘리지 않도록 영역 내에 맞춤 */
     object-position: center;
 }
+
+/* 모달 내부의 가로 배치를 유동적으로 조절하는 컨테이너 */
+.modal-flex-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center; /* 이미지와 텍스트의 세로 중앙 정렬 */
+    gap: 2rem;           /* 이미지와 텍스트 사이의 간격 */
+}
+
+
+
+/* 공통 모달 레이아웃 그리드 (PC 기준) */
+.modal-dynamic-grid {
+    display: grid;
+    /* 왼쪽 이미지 영역은 내부 설정 크기만큼 고정, 오른쪽 텍스트는 남은 공간 전부(1fr) 차지 */
+    grid-template-columns: max-content 1fr;
+    align-items: center;      /* 규칙 5, 6: 세로축 기준 정중앙 정렬 */
+    gap: 2.5rem;              /* 이미지와 텍스트 사이의 간격 */
+    width: 100%;
+}
+
+/* 이미지 부모 컨테이너 공통 정의 */
+.modal-img-container {
+    display: flex;
+    justify-content: center;  /* 규칙 6: 가로 기준 가운데 정렬 */
+    align-items: center;      /* 규칙 6: 세로 기준 가운데 정렬 */
+}
+
+/* 규칙 2 수정: 가로형 이미지 컨테이너 (6:4 비율을 위한 공간 너비 할당) */
+.modal-img-container.landscape {
+    width: 440px;             /* modal-lg 전체 너비 기준 약 60% 공간 차지 */
+}
+
+/* 규칙 3: 세로형 이미지 컨테이너 (3:7 비율을 위한 공간 너비 할당) */
+.modal-img-container.portrait {
+    width: 220px;             /* modal-lg 전체 너비 기준 약 30% 공간 차지 */
+}
+
+/* 이미지 스케일링 기본 정의 */
+.modal-pf-img {
+    display: block;
+    width: 100%;              /* 규칙 4: 지정된 컨테이너 너비에 가로폭을 맞춤 */
+    height: auto;             /* 규칙 4: 종횡비(가로세로 비율) 유지 */
+    object-fit: contain;      /* 규칙 4: 이미지를 자르지 않고 스케일링 */
+}
+
+/* 텍스트 컨테이너 정렬 정의 */
+.modal-text-box {
+    text-align: left;         /* 규칙 5: 텍스트 좌측 정렬 */
+    width: 100%;
+}
+
+/* 반응형 처리: 태블릿 및 모바일 모드 */
+@media (max-width: 991.98px) {
+    .modal-dynamic-grid {
+        grid-template-columns: 1fr; /* 화면이 좁아지면 1열 위아래 배치로 전환 */
+        gap: 1.5rem;
+    }
+    .modal-img-container.landscape,
+    .modal-img-container.portrait {
+        width: 100%;          /* 모바일에서는 부모 너비를 가득 채우도록 변경 */
+    }
+    .modal-pf-img {
+        max-width: 250px;     /* 모바일에서 과도하게 커지는 현상 방지 */
+        margin: 0 auto;
+    }
+}

@@ -2391,3 +2391,26 @@ tangball 구글계정으로 consol.cloud.google.com에서 일부 사항 수정
 4. nano 에디터로 settings에 account default http protocol ='https'추가.
 
 나 다 했는데 왜 https가 아니라 http로 리다이렉션 되려 하지?
+
+## 68일차
+
+임시로 때워둔 이미지 바꿔서 넣어둠.
+
+로컬에서 커밋
+서버에서 pull
+~/github/django_web_app$ sudo docker compose exec web python manage.py collectstatic --noinput 
+혹시 모르니 컨테이너 다운 후 up -d --build
+이미지 삽입 정상 완료된 것 확인
+
+문제 발생. 이미지 사이즈 너무 큼.
+-> 새로 삽입한 일부 이미지가 사이즈 조정이 안되는 점. 특히 내 사진이.
+-> 그리고 모달 내 이미지들도 가로가 긴 것과 세로가 긴 것이 다름. 가로에 맞추니 세로형 이미지가 너무 커지는 문제.
+
+내 사진은 대략 조정 완료
+
+모달 내 이미지는 크기 조정을 완전 자동화하려면 js로 자동 판별을 돌려야 함.
+
+우선 portrait(세로형)와 landscape(가로형) 구분을 수동으로 쓰는 방식 채택
+상세하게는 ai돌린거.
+
+현재 버전도 마음에 드니까 일단 그냥 두기로.
