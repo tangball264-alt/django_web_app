@@ -2372,3 +2372,22 @@ curl -L https://raw.githubusercontent.com/wmnnd/nginx-certbot/master/init-letsen
 
 sh파일에서는 docker-compose라고 적혀 있어서 문제 발생. 나는 이 라이브러리가 아니라 docker compose 를 쓰는 버전임.
 따라서 해당 내용 수정 후 재업+다시 pull
+
+발생한 문제
+1. 이거 pull하기 전에 aws가서 443포트(https)생성해야 했는데 안해서  sudo ./init-letsencrypt.sh 이 명령어가 오류냠.
+2. 그리고 그 전에 sudo docker compose build nginx해야 하는데 또 까먹어서  sudo ./init-letsencrypt.sh 이 명령어 오류남 22
+3. 그리고 2를 늦게 알아서 방법 찾는다고 클라우드플레어에서 프록시 꺼봄. 이건 실제로 문제였는지 아닌지도 모르겠어.
+
+
+그래도 정상적으로 성공함.
+실제 사이트 접속 후 '이 연결은 안전합니다.' '인증서가 유효함'등 문구 확인.
+
+다음 단계 : 구글 로그인 활성화
+
+tangball 구글계정으로 consol.cloud.google.com에서 일부 사항 수정
+1. 내 도메인을 '승인된 도메인'에 추가
+2. 애플리케이션 홈페이지 링크에 https://내 도메인 추가
+3. OAuth 2.0 client ID 항목 들어가서 '승인된 자바스크립트 원본'아래에 https://내 도메인 추가. '승인된 리다이렉션 uri'항목에 https://내 도메인/accounts/google/login/callback/ 추가.
+4. nano 에디터로 settings에 account default http protocol ='https'추가.
+
+나 다 했는데 왜 https가 아니라 http로 리다이렉션 되려 하지?
