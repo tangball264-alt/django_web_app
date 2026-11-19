@@ -79,8 +79,6 @@ class Post(models.Model):#데이터베이스 테이블로 이 데이터들을 �
             'blockquote',
             'code', 'pre',
             'del',                       # 취소선
-            'table', 'thead', 'tbody',   # 테이블
-            'tr', 'th', 'td'
         ]
 
         cleaned = bleach.clean(
